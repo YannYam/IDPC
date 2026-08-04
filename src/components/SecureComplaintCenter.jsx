@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
-import { Lock, Shield, Send, CheckCircle2, AlertCircle, FileLock2, KeyRound, Key, ShieldCheck, FileCheck, UploadCloud, FileText, Download, Layers, X, Paperclip } from 'lucide-react';
+import { Lock, Shield, Send, CheckCircle2, AlertCircle, FileLock2, KeyRound, Key, ShieldCheck, FileCheck, UploadCloud, FileText, Download, Layers, X, Paperclip, User, Phone, Share2, Info, UserX } from 'lucide-react';
 
 export default function SecureComplaintCenter({ complaints, setComplaints, ppksAuthSession }) {
   const [activeSection, setActiveSection] = useState('form');
   const [formData, setFormData] = useState({
     category: 'Kebocoran Data Pribadi (Data Leak)',
     reportedEntity: '',
+    perpetratorPhone: '',
+    perpetratorPlatform: 'Instagram',
+    perpetratorSocial: '',
+    perpetratorDetails: '',
     incidentDate: '',
     description: '',
     isAnonymous: true,
+    reporterName: '',
+    reporterNik: '',
+    reporterContact: '',
     encryptPayload: true,
   });
   const [attachedEvidence, setAttachedEvidence] = useState([]);
@@ -16,6 +23,7 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
   const [evidenceError, setEvidenceError] = useState('');
   const [submittedTicket, setSubmittedTicket] = useState(null);
   const [selectedFileForCert, setSelectedFileForCert] = useState(null);
+  const [selectedComplaintDetail, setSelectedComplaintDetail] = useState(null);
 
   const isAuthorized = ppksAuthSession && ppksAuthSession.isAuthenticated;
 
@@ -54,18 +62,54 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
       return;
     }
     setEvidenceError('');
+    
     const randomTicket = `IDPC-CRYPT-${Math.floor(1000 + Math.random() * 9000)}`;
+    const anonAlias = `PELAPOR-ANON-${Math.floor(1000 + Math.random() * 9000)}`;
+    
+    const reporterInfo = formData.isAnonymous 
+      ? `${anonAlias} (Anonim Terenkripsi)` 
+      : `${formData.reporterName} (NIK: ${formData.reporterNik})`;
+
+    const socialInfo = formData.perpetratorSocial ? `[${formData.perpetratorPlatform}] ${formData.perpetratorSocial}` : '';
+    const perpFullDetails = `${formData.reportedEntity} ${formData.perpetratorPhone ? '• HP: ' + formData.perpetratorPhone : ''} ${socialInfo ? '• ' + socialInfo : ''}`;
+
     const newComplaint = {
-      id: Date.now(), ticketCode: randomTicket, category: formData.category,
+      id: Date.now(), 
+      ticketCode: randomTicket, 
+      category: formData.category,
       entity: formData.reportedEntity || 'Institusi Rahasia (Terenskripsi)',
+      perpetratorPhone: formData.perpetratorPhone || 'N/A',
+      perpetratorPlatform: formData.perpetratorPlatform,
+      perpetratorSocial: formData.perpetratorSocial || 'N/A',
+      perpetratorDetails: formData.perpetratorDetails || 'N/A',
+      perpetratorFullSummary: perpFullDetails,
       date: formData.incidentDate || new Date().toISOString().split('T')[0],
-      status: 'Terdaftar - Audit IDPC', isAnonymous: formData.isAnonymous,
-      encrypted: formData.encryptPayload, evidenceCount: attachedEvidence.length,
+      status: 'Terdaftar - Audit IDPC', 
+      isAnonymous: formData.isAnonymous,
+      reporterIdentity: reporterInfo,
+      reporterContact: formData.isAnonymous ? 'N/A (Sesi Anonim)' : formData.reporterContact,
+      encrypted: formData.encryptPayload, 
+      evidenceCount: attachedEvidence.length,
       evidence: attachedEvidence
     };
+
     setComplaints([newComplaint, ...complaints]);
     setSubmittedTicket({ ...newComplaint, attachedEvidence: [...attachedEvidence] });
-    setFormData({ category: 'Kebocoran Data Pribadi (Data Leak)', reportedEntity: '', incidentDate: '', description: '', isAnonymous: true, encryptPayload: true });
+    setFormData({ 
+      category: 'Kebocoran Data Pribadi (Data Leak)', 
+      reportedEntity: '', 
+      perpetratorPhone: '',
+      perpetratorPlatform: 'Instagram',
+      perpetratorSocial: '',
+      perpetratorDetails: '',
+      incidentDate: '', 
+      description: '', 
+      isAnonymous: true, 
+      reporterName: '',
+      reporterNik: '',
+      reporterContact: '',
+      encryptPayload: true 
+    });
     setAttachedEvidence([]);
   };
 
@@ -115,10 +159,10 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
 
             {!submittedTicket ? (
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {/* Step 1: Incident Details */}
+                {/* Step 1: Incident & Perpetrator Details */}
                 <div style={{ background: '#eff6ff', padding: '10px 14px', borderRadius: '8px', fontSize: '12.5px', color: '#1d4ed8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ background: '#2563eb', color: '#fff', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', flexShrink: 0 }}>1</span>
-                  Detail Insiden & Pihak Terlapor
+                  Detail Insiden & Identifikasi Terlapor (Pelaku)
                 </div>
 
                 <div className="form-group">
@@ -132,9 +176,81 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                   </select>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Institusi / Pihak Terlapor (Pengendali Data)</label>
-                  <input type="text" className="form-input" placeholder="Contoh: PT Financial Mega, Universitas XYZ, Aplikasi ABC" required value={formData.reportedEntity} onChange={(e) => setFormData({ ...formData, reportedEntity: e.target.value })} />
+                {/* Detailed Perpetrator Identification Sub-Card */}
+                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '14px', borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#991b1b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <UserX size={16} color="#dc2626" />
+                    <span>Identifikasi Pihak Terlapor / Pelaku (Perpetrator Disclosure)</span>
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ color: '#7f1d1d' }}>Nama Institusi / Nama Pelaku (Terlapor)</label>
+                    <input 
+                      type="text" 
+                      className="form-input" 
+                      placeholder="Contoh: PT Financial Mega, Universitas XYZ, Aplikasi ABC, atau Nama Individu" 
+                      required 
+                      value={formData.reportedEntity} 
+                      onChange={(e) => setFormData({ ...formData, reportedEntity: e.target.value })} 
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ color: '#7f1d1d' }}>No. Telepon / WhatsApp Terlapor</label>
+                    <input 
+                      type="text" 
+                      className="form-input" 
+                      placeholder="0812... / +62..." 
+                      value={formData.perpetratorPhone} 
+                      onChange={(e) => setFormData({ ...formData, perpetratorPhone: e.target.value })} 
+                    />
+                  </div>
+
+                  {/* Social Media Selection Dropdown & Username Handle Input */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: '10px' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ color: '#7f1d1d' }}>Platform Media Sosial</label>
+                      <select 
+                        className="form-select" 
+                        value={formData.perpetratorPlatform}
+                        onChange={(e) => setFormData({ ...formData, perpetratorPlatform: e.target.value })}
+                      >
+                        <option value="Instagram">Instagram</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="Telegram">Telegram</option>
+                        <option value="X (Twitter)">X (Twitter)</option>
+                        <option value="TikTok">TikTok</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="Discord">Discord</option>
+                        <option value="Line">Line</option>
+                        <option value="Darkweb / Forum Anonim">Darkweb / Forum Anonim</option>
+                        <option value="Lainnya">Lainnya</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ color: '#7f1d1d' }}>Akun / Username / Tautan Medsos</label>
+                      <input 
+                        type="text" 
+                        className="form-input" 
+                        placeholder="Misal: @username atau instagram.com/..." 
+                        value={formData.perpetratorSocial} 
+                        onChange={(e) => setFormData({ ...formData, perpetratorSocial: e.target.value })} 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ color: '#7f1d1d' }}>Informasi Tambahan / Profil Terlapor (Opsional)</label>
+                    <input 
+                      type="text" 
+                      className="form-input" 
+                      placeholder="Informasi domisili, instansi, NIK, atau catatan identitas pelaku lainnya..." 
+                      value={formData.perpetratorDetails} 
+                      onChange={(e) => setFormData({ ...formData, perpetratorDetails: e.target.value })} 
+                    />
+                  </div>
                 </div>
 
                 <div className="form-group">
@@ -189,17 +305,83 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                   </div>
                 )}
 
-                {/* Step 3: Security Options */}
+                {/* Step 3: Security Options & Functional Anonymous Mode */}
                 <div style={{ background: '#f3e8ff', padding: '10px 14px', borderRadius: '8px', fontSize: '12.5px', color: '#6d28d9', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ background: '#7c3aed', color: '#fff', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', flexShrink: 0 }}>3</span>
-                  Opsi Keamanan & Enkripsi
+                  Opsi Keamanan & Mode Identitas Pelapor
                 </div>
 
-                <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '10px', border: '1px solid #e2e8f0' }}>
+                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '14px', border: '1px solid #e2e8f0' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13.5px', color: '#334155' }}>
-                    <input type="checkbox" checked={formData.isAnonymous} onChange={(e) => setFormData({ ...formData, isAnonymous: e.target.checked })} />
+                    <input 
+                      type="checkbox" 
+                      checked={formData.isAnonymous} 
+                      onChange={(e) => setFormData({ ...formData, isAnonymous: e.target.checked })} 
+                    />
                     <span><strong>Mode Pelaporan Anonim (Sembunyikan NIK & Identitas Saya)</strong></span>
                   </label>
+
+                  {formData.isAnonymous ? (
+                    <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '12px 14px', borderRadius: '10px', fontSize: '12.5px', color: '#047857', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                      <Lock size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
+                      <div>
+                        <strong>🛡️ Perlindungan Identitas Anonim Aktif:</strong>
+                        <p style={{ marginTop: '2px', color: '#334155' }}>
+                          Sistem akan menggenerasi <strong>Kunci Alias Kriptografis Salt</strong> otomatis (misal: <code>PELAPOR-ANON-8492</code>). Nama asli, NIK, dan nomor HP Anda <strong>tidak akan dicatat atau disimpan</strong> dalam server IDPC.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: '#ffffff', padding: '14px', borderRadius: '10px', border: '1px solid #cbd5e1' }}>
+                      <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <User size={15} color="#2563eb" />
+                        <span>Identitas Resmi Pelapor (Mode Terverifikasi)</span>
+                      </div>
+
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label">Nama Lengkap Pelapor</label>
+                        <input 
+                          type="text" 
+                          className="form-input" 
+                          placeholder="Masukkan nama lengkap sesuai KTP" 
+                          required={!formData.isAnonymous}
+                          value={formData.reporterName} 
+                          onChange={(e) => setFormData({ ...formData, reporterName: e.target.value })} 
+                        />
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                          <label className="form-label">NIK (16 Digit)</label>
+                          <input 
+                            type="text" 
+                            className="form-input" 
+                            placeholder="32710..." 
+                            maxLength={16}
+                            required={!formData.isAnonymous}
+                            value={formData.reporterNik} 
+                            onChange={(e) => setFormData({ ...formData, reporterNik: e.target.value })} 
+                          />
+                        </div>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                          <label className="form-label">No. WhatsApp / Email</label>
+                          <input 
+                            type="text" 
+                            className="form-input" 
+                            placeholder="0812... / email@..." 
+                            required={!formData.isAnonymous}
+                            value={formData.reporterContact} 
+                            onChange={(e) => setFormData({ ...formData, reporterContact: e.target.value })} 
+                          />
+                        </div>
+                      </div>
+
+                      <p style={{ fontSize: '11.5px', color: '#64748b', margin: 0 }}>
+                        🔒 Identitas Anda disimpang dengan enkripsi AES-256 dan hanya dapat diakses oleh investigator PPKS resmi.
+                      </p>
+                    </div>
+                  )}
+
                   <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13.5px', color: '#334155' }}>
                     <input type="checkbox" checked={formData.encryptPayload} onChange={(e) => setFormData({ ...formData, encryptPayload: e.target.checked })} />
                     <span>Enkripsi Kriptografis AES-256 pada Muatan Berkas (Payload)</span>
@@ -217,14 +399,43 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                 <CheckCircle2 size={42} color="#059669" style={{ margin: '0 auto 10px' }} />
                 <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#047857' }}>PENGADUAN & BUKTI BERHASIL TERKUNCI</h4>
                 <p style={{ fontSize: '13px', color: '#475569', marginTop: '6px' }}>Pengaduan beserta {submittedTicket.attachedEvidence.length} berkas bukti digital telah terverifikasi dan terenkripsi dalam Brankas IDPC.</p>
-                <div style={{ background: '#ffffff', padding: '14px', borderRadius: '8px', margin: '16px 0', border: '1px solid #cbd5e1', textAlign: 'left' }}>
-                  <div style={{ fontSize: '12px', color: '#64748b' }}>Nomor Tiket Kriptografis:</div>
-                  <div style={{ fontSize: '20px', fontWeight: 800, color: '#1d4ed8', fontFamily: 'monospace' }}>{submittedTicket.ticketCode}</div>
-                  <div style={{ marginTop: '10px', fontSize: '12px', color: '#64748b' }}>Bukti Terlampir:</div>
-                  {submittedTicket.attachedEvidence.map(f => (
-                    <div key={f.id} style={{ fontSize: '12px', color: '#059669', fontFamily: 'monospace', marginTop: '2px' }}>✓ {f.name} ({f.sha256.substring(0, 16)}...)</div>
-                  ))}
+                
+                <div style={{ background: '#ffffff', padding: '14px', borderRadius: '8px', margin: '16px 0', border: '1px solid #cbd5e1', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>Nomor Tiket Kriptografis:</div>
+                    <div style={{ fontSize: '20px', fontWeight: 800, color: '#1d4ed8', fontFamily: 'monospace' }}>{submittedTicket.ticketCode}</div>
+                  </div>
+
+                  <div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>Status Identitas Pelapor:</div>
+                    <div style={{ fontSize: '13.5px', fontWeight: 700, color: submittedTicket.isAnonymous ? '#059669' : '#1e293b' }}>
+                      {submittedTicket.isAnonymous ? (
+                        <span className="badge badge-emerald" style={{ padding: '4px 10px', fontSize: '12px' }}>
+                          🛡️ {submittedTicket.reporterIdentity}
+                        </span>
+                      ) : (
+                        <span className="badge badge-blue" style={{ padding: '4px 10px', fontSize: '12px' }}>
+                          👤 {submittedTicket.reporterIdentity}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>Identitas Terlapor / Pelaku:</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#dc2626' }}>
+                      {submittedTicket.perpetratorFullSummary}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>Bukti Terlampir:</div>
+                    {submittedTicket.attachedEvidence.map(f => (
+                      <div key={f.id} style={{ fontSize: '12px', color: '#059669', fontFamily: 'monospace', marginTop: '2px' }}>✓ {f.name} ({f.sha256.substring(0, 16)}...)</div>
+                    ))}
+                  </div>
                 </div>
+
                 <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px' }}>Simpan nomor tiket untuk melacak progres audit tanpa perlu login.</p>
                 <button className="btn btn-secondary" onClick={() => setSubmittedTicket(null)}>Buat Pengaduan Baru</button>
               </div>
@@ -294,8 +505,8 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                   <p style={{ marginTop: '2px' }}>Setiap pengaduan wajib dilampirkan minimal 1 bukti digital konkret (screenshot, dokumen, video) sebagai syarat admisibilitas hukum UU PDP & UU ITE.</p>
                 </div>
                 <div style={{ background: '#fff', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                  <strong style={{ color: '#2563eb' }}>🔐 Kalkulasi SHA-256</strong>
-                  <p style={{ marginTop: '2px' }}>Hash kriptografi dikalkulasi secara client-side. Berkas tidak pernah meninggalkan perangkat Anda sebelum dienkripsi.</p>
+                  <strong style={{ color: '#2563eb' }}>🔐 Mode Pelaporan & SHA-256</strong>
+                  <p style={{ marginTop: '2px' }}>Pilih Mode Anonim untuk menyamarkan identitas secara kriptografis, atau Mode Resmi dengan NIK terenkripsi.</p>
                 </div>
               </div>
             </div>
@@ -315,11 +526,12 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
         </div>
       )}
 
-      {/* ====== REGISTRY (Investigator Only) ====== */}
+      {/* ====== REGISTRY (Investigator Nasional Only) ====== */}
       {activeSection === 'registry' && (
         <>
-          {isAuthorized ? (
-            <div className="card" style={{ border: '1px solid #ddd6fe' }}>
+          {isAuthorized && ppksAuthSession?.isNationalInvestigator ? (
+            <>
+              <div className="card" style={{ border: '1px solid #ddd6fe' }}>
               <div className="card-header">
                 <h3 className="card-title"><Shield size={20} color="#7c3aed" /><span>Registri Pengaduan Masuk (Audit IDPC)</span></h3>
                 <span className="badge badge-purple">{complaints.length} Berkas Active</span>
@@ -329,27 +541,192 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
               </div>
               <div style={{ overflowX: 'auto' }}>
                 <table className="custom-table">
-                  <thead><tr><th>No. Tiket</th><th>Kategori</th><th>Institusi Terlapor</th><th>Tanggal</th><th>Bukti</th><th>Status IDPC</th></tr></thead>
+                  <thead>
+                    <tr>
+                      <th>No. Tiket</th>
+                      <th>Identitas Pelapor</th>
+                      <th>Kategori</th>
+                      <th>Institusi / Pelaku Terlapor</th>
+                      <th>Tanggal</th>
+                      <th>Bukti</th>
+                      <th>Status IDPC</th>
+                      <th>Aksi Investigator</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     {complaints.map(item => (
                       <tr key={item.id}>
                         <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#2563eb' }}>{item.ticketCode}</td>
+                        <td>
+                          {item.isAnonymous ? (
+                            <span className="badge badge-emerald" style={{ fontSize: '11px' }}>
+                              🛡️ {item.reporterIdentity || 'PELAPOR-ANON (Terenskripsi)'}
+                            </span>
+                          ) : (
+                            <span className="badge badge-blue" style={{ fontSize: '11px' }}>
+                              👤 {item.reporterIdentity || 'Terverifikasi ID'}
+                            </span>
+                          )}
+                        </td>
                         <td style={{ fontSize: '12.5px' }}>{item.category}</td>
-                        <td style={{ color: '#0f172a' }}>{item.entity}</td>
+                        <td style={{ color: '#0f172a', fontWeight: 600 }}>{item.perpetratorFullSummary || item.entity}</td>
                         <td style={{ fontSize: '12px', color: '#475569' }}>{item.date}</td>
-                        <td><span className="badge badge-emerald" style={{ fontSize: '11px' }}>{item.evidenceCount || '—'} Berkas</span></td>
+                        <td><span className="badge badge-emerald" style={{ fontSize: '11px' }}>{item.evidenceCount || '1'} Berkas</span></td>
                         <td><span className="badge badge-amber">{item.status}</span></td>
+                        <td>
+                          <button 
+                            className="btn btn-primary" 
+                            style={{ padding: '4px 10px', fontSize: '11.5px' }}
+                            onClick={() => setSelectedComplaintDetail(item)}
+                          >
+                            <FileText size={13} />
+                            <span>Detail Pengaduan</span>
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             </div>
-          ) : (
+
+            {/* Investigator Detailed Complaint Inspection Modal */}
+            {selectedComplaintDetail && (
+              <div className="modal-overlay" style={{ zIndex: 1200 }}>
+                <div className="modal-card" style={{ maxWidth: '680px', padding: '24px', border: '2px solid #2563eb' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '14px', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ background: '#eff6ff', padding: '10px', borderRadius: '10px', color: '#2563eb' }}>
+                        <FileLock2 size={24} />
+                      </div>
+                      <div>
+                        <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#0f172a' }}>
+                          Detail Pengaduan: {selectedComplaintDetail.ticketCode}
+                        </h3>
+                        <p style={{ fontSize: '12px', color: '#64748b' }}>
+                          Daftar Audit Investigasi Resmi IDPC & Satgas PPKS
+                        </p>
+                      </div>
+                    </div>
+                    <button className="btn btn-secondary" style={{ padding: '4px 10px' }} onClick={() => setSelectedComplaintDetail(null)}>
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {/* Status & Category Banner */}
+                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div>
+                        <div style={{ fontSize: '11.5px', color: '#64748b' }}>Kategori Pelanggaran PDP:</div>
+                        <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b' }}>{selectedComplaintDetail.category}</div>
+                      </div>
+                      <span className="badge badge-purple" style={{ fontSize: '12px' }}>{selectedComplaintDetail.status}</span>
+                    </div>
+
+                    {/* Perpetrator Disclosure Box */}
+                    <div style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '14px', borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#991b1b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <UserX size={16} color="#dc2626" />
+                        <span>Identifikasi Pihak Terlapor / Pelaku (Perpetrator Disclosure)</span>
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#7f1d1d', lineHeight: '1.5' }}>
+                        <div><strong>Institusi / Nama Terlapor:</strong> {selectedComplaintDetail.entity || selectedComplaintDetail.reportedEntity || 'Tidak Diketahui'}</div>
+                        <div><strong>No. Telepon / WhatsApp:</strong> {selectedComplaintDetail.perpetratorPhone || 'N/A'}</div>
+                        <div><strong>Platform & Medsos:</strong> [{selectedComplaintDetail.perpetratorPlatform || 'Instagram'}] {selectedComplaintDetail.perpetratorSocial || 'N/A'}</div>
+                        <div><strong>Informasi Profil Tambahan:</strong> {selectedComplaintDetail.perpetratorDetails || 'Tidak Ada Catatan Tambahan'}</div>
+                      </div>
+                    </div>
+
+                    {/* Reporter Identity & Contact Box */}
+                    <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '14px', borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#1e40af', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <User size={16} color="#2563eb" />
+                        <span>Identitas Pelapor & Kontak Korban</span>
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#1e3a8a' }}>
+                        <div><strong>Identitas:</strong> {selectedComplaintDetail.reporterIdentity}</div>
+                        <div><strong>Kontak Pelapor:</strong> {selectedComplaintDetail.reporterContact || 'N/A (Anonim Sesi)'}</div>
+                        <div><strong>Enkripsi Payload:</strong> {selectedComplaintDetail.encrypted ? '🔒 Zero-Knowledge Encrypted Payload' : 'Standar'}</div>
+                      </div>
+                    </div>
+
+                    {/* Evidence Verification Section */}
+                    <div>
+                      <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
+                        📎 Berkas Bukti Digital & Hash SHA-256:
+                      </div>
+                      {selectedComplaintDetail.evidence && selectedComplaintDetail.evidence.length > 0 ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {selectedComplaintDetail.evidence.map(ev => (
+                            <div key={ev.id} style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '10px', borderRadius: '8px', fontSize: '12px' }}>
+                              <div style={{ fontWeight: 700, color: '#047857' }}>{ev.name} ({ev.size})</div>
+                              <div style={{ fontFamily: 'monospace', color: '#2563eb', fontSize: '11px', marginTop: '2px', wordBreak: 'break-all' }}>
+                                SHA-256: {ev.sha256}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: '12.5px', color: '#64748b', background: '#f8fafc', padding: '10px', borderRadius: '8px' }}>
+                          {selectedComplaintDetail.evidenceCount || 1} Berkas Bukti Digital Terenkripsi Terlampir dalam Brankas.
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Controls for Investigator */}
+                    <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '14px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      <button 
+                        className="btn btn-primary" 
+                        style={{ flex: 1 }}
+                        onClick={() => {
+                          const updated = complaints.map(c => c.id === selectedComplaintDetail.id ? { ...c, status: 'Investigasi Formal IDPC' } : c);
+                          setComplaints(updated);
+                          setSelectedComplaintDetail({ ...selectedComplaintDetail, status: 'Investigasi Formal IDPC' });
+                        }}
+                      >
+                        <ShieldCheck size={16} />
+                        <span>Mulai Investigasi Formal</span>
+                      </button>
+                      <button 
+                        className="btn btn-secondary" 
+                        style={{ flex: 1, color: '#059669', borderColor: '#a7f3d0' }}
+                        onClick={() => {
+                          const updated = complaints.map(c => c.id === selectedComplaintDetail.id ? { ...c, status: 'Selesai - Terverifikasi' } : c);
+                          setComplaints(updated);
+                          setSelectedComplaintDetail({ ...selectedComplaintDetail, status: 'Selesai - Terverifikasi' });
+                        }}
+                      >
+                        <CheckCircle2 size={16} />
+                        <span>Selesaikan Kasus</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
             <div className="card" style={{ textAlign: 'center', padding: '48px 24px', background: '#f8fafc', border: '2px dashed #cbd5e1' }}>
               <Lock size={48} color="#7c3aed" style={{ margin: '0 auto 16px' }} />
-              <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a' }}>Akses Ditolak: Registri Pengaduan Masuk</h3>
-              <p style={{ fontSize: '13.5px', color: '#475569', maxWidth: '520px', margin: '8px auto 0' }}>Masuk melalui Portal Satgas PPKS Investigator untuk mengakses daftar pengaduan.</p>
+              <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a' }}>
+                {isAuthorized ? 'Akses Terbatas: Otorisasi Khusus Investigator Nasional IDPC' : 'Akses Ditolak: Registri Pengaduan Masuk'}
+              </h3>
+              <p style={{ fontSize: '13.5px', color: '#475569', maxWidth: '560px', margin: '8px auto 16px', lineHeight: '1.6' }}>
+                {isAuthorized 
+                  ? `Sesi Anda terverifikasi sebagai (${ppksAuthSession.officerName} - ${ppksAuthSession.campus}). Registri Pengaduan & Audit Nasional ini hanya dapat diakses oleh Investigator Nasional IDPC. Untuk mengelola berkas kasus kampus Anda, silakan beralih ke modul Campus Privacy Center.`
+                  : 'Registri audit pengaduan nasional ini dilindungi oleh sertifikat otoritas investigator. Silakan masuk melalui Portal Investigator Satgas PPKS.'
+                }
+              </p>
+              {!isAuthorized && (
+                <button 
+                  className="btn" 
+                  style={{ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: '#fff', margin: '0 auto' }}
+                  onClick={onRequestAuth}
+                >
+                  <Lock size={15} />
+                  <span>Autentikasi Sesi Investigator</span>
+                </button>
+              )}
             </div>
           )}
         </>

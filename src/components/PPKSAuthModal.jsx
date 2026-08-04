@@ -13,17 +13,27 @@ export default function PPKSAuthModal({ isOpen, onClose, onAuthenticate }) {
   // Preset demo accounts for quick testing
   const demoAccounts = [
     {
+      campus: 'Nasional (Komisi PDP)',
+      officerName: 'Dr. H. Bambang Soetopo, S.H., M.H.',
+      officerId: 'IDPC-NAT-AUDIT-001',
+      roleTitle: 'Investigator Nasional IDPC (Auditor UU PDP)',
+      isNationalInvestigator: true,
+      pin: '9900'
+    },
+    {
       campus: 'Universitas Indonesia',
       officerName: 'Dr. Rina Wijaya, S.H., M.H.',
       officerId: 'PPKS-UI-2026-092',
-      roleTitle: 'Ketua Satgas PPKS & Investigator Utama UI',
+      roleTitle: 'Ketua Satgas PPKS & Investigator UI',
+      isNationalInvestigator: false,
       pin: '8899'
     },
     {
       campus: 'Universitas Gadjah Mada',
       officerName: 'Prof. Dr. Hendra K., M.Si.',
       officerId: 'PPKS-UGM-2026-104',
-      roleTitle: 'Kepala Divisi Hukum & Penanganan Korban UGM',
+      roleTitle: 'Kepala Divisi Penanganan Korban UGM',
+      isNationalInvestigator: false,
       pin: '7722'
     },
     {
@@ -31,6 +41,7 @@ export default function PPKSAuthModal({ isOpen, onClose, onAuthenticate }) {
       officerName: 'Dr. Ahmad Zaini, S.H.',
       officerId: 'PPKS-UNRAM-2026-301',
       roleTitle: 'Koordinator Satgas PPKS UNRAM',
+      isNationalInvestigator: false,
       pin: '5511'
     }
   ];
@@ -44,14 +55,17 @@ export default function PPKSAuthModal({ isOpen, onClose, onAuthenticate }) {
     setErrorMessage('');
     setIsVerifying(true);
 
+    const isNat = selectedCampus === 'Nasional (Komisi PDP)' || officerId.toUpperCase().includes('IDPC-NAT');
+
     setTimeout(() => {
       setIsVerifying(false);
       const session = {
         isAuthenticated: true,
-        officerName: `Petugas Satgas (${officerId.trim()})`,
+        officerName: `Petugas (${officerId.trim()})`,
         officerId: officerId.trim(),
         campus: selectedCampus,
-        roleTitle: `Investigator Terverifikasi Satgas ${selectedCampus}`,
+        roleTitle: isNat ? 'Investigator Nasional IDPC' : `Satgas PPKS ${selectedCampus}`,
+        isNationalInvestigator: isNat,
         token: `AUTH-SIG-${Math.floor(10000 + Math.random() * 90000)}`,
         verifiedAt: new Date().toLocaleString()
       };
@@ -74,6 +88,7 @@ export default function PPKSAuthModal({ isOpen, onClose, onAuthenticate }) {
         officerId: acc.officerId,
         campus: acc.campus,
         roleTitle: acc.roleTitle,
+        isNationalInvestigator: Boolean(acc.isNationalInvestigator),
         token: `AUTH-SIG-IDPC-${Math.floor(100000 + Math.random() * 900000)}`,
         verifiedAt: new Date().toLocaleString()
       };
@@ -108,6 +123,7 @@ export default function PPKSAuthModal({ isOpen, onClose, onAuthenticate }) {
               value={selectedCampus}
               onChange={(e) => setSelectedCampus(e.target.value)}
             >
+              <option>Nasional (Komisi PDP)</option>
               <option>Universitas Indonesia</option>
               <option>Universitas Gadjah Mada</option>
               <option>Universitas Mataram</option>

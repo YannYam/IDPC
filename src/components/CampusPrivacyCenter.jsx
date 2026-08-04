@@ -19,7 +19,10 @@ import {
   Award, 
   Check,
   LogOut,
-  Sparkles
+  Sparkles,
+  UploadCloud,
+  Paperclip,
+  X
 } from 'lucide-react';
 
 export default function CampusPrivacyCenter({ 
@@ -38,8 +41,20 @@ export default function CampusPrivacyCenter({
     campus: 'Universitas Indonesia',
     category: 'Kekerasan Seksual Berbasis Siber (KSBS)',
     threatDetail: '',
-    urgentCounseling: true
+    urgentCounseling: true,
+    isAnonymous: true,
+    reporterName: '',
+    reporterNim: '',
+    reporterFaculty: '',
+    reporterContact: '',
+    perpetratorStatus: 'Mahasiswa',
+    perpetratorPlatform: 'Instagram',
+    perpetratorName: '',
+    perpetratorFaculty: ''
   });
+  const [attachedEvidence, setAttachedEvidence] = useState([]);
+  const [isHashing, setIsHashing] = useState(false);
+  const [evidenceError, setEvidenceError] = useState('');
   const [submittedTicket, setSubmittedTicket] = useState(null);
 
   // Public Case Tracker State
@@ -70,29 +85,91 @@ export default function CampusPrivacyCenter({
     }
   }, [userRole]);
 
+  // Handle Evidence Upload with SHA-256 Calculation
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setIsHashing(true);
+    setEvidenceError('');
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      setAttachedEvidence(prev => [...prev, {
+        id: Date.now(),
+        name: file.name,
+        size: `${(file.size / 1024).toFixed(1)} KB`,
+        type: file.type || 'Berkas Digital',
+        sha256: hashHex,
+        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC',
+        status: 'Terverifikasi (SHA-256)'
+      }]);
+    } catch (err) { console.error(err); }
+    finally { setIsHashing(false); }
+    e.target.value = '';
+  };
+
+  const handleRemoveEvidence = (id) => {
+    setAttachedEvidence(prev => prev.filter(f => f.id !== id));
+  };
+
   // Handle Public Submission
   const handlePublicSubmit = (e) => {
     e.preventDefault();
+    if (attachedEvidence.length === 0) {
+      setEvidenceError('Wajib melampirkan minimal 1 (satu) bukti digital konkret (screenshot chat, dokumen, rekaman) sebelum laporan PPKS dapat dikirim.');
+      return;
+    }
+    setEvidenceError('');
+
     const newId = `PPKS-2026-00${campusCases.length + 1}`;
-    const alias = `Korban-STUDENT-${Math.floor(1000 + Math.random() * 9000)}`;
+    const alias = reporterForm.isAnonymous 
+      ? `Korban-STUDENT-${Math.floor(1000 + Math.random() * 9000)}`
+      : `${reporterForm.reporterName} (NIM: ${reporterForm.reporterNim})`;
+
+    const perpDetails = `${reporterForm.perpetratorStatus}: ${reporterForm.perpetratorName || 'Tidak Sebut Nama'} [Platform: ${reporterForm.perpetratorPlatform}] (${reporterForm.perpetratorFaculty || 'N/A'})`;
+
     const newCase = {
       id: newId,
       campus: reporterForm.campus,
       category: reporterForm.category,
       victimAlias: alias,
+      isAnonymous: reporterForm.isAnonymous,
+      reporterContact: reporterForm.isAnonymous ? 'N/A (Anonim Sesi)' : reporterForm.reporterContact,
+      perpetratorInfo: perpDetails,
       priority: reporterForm.urgentCounseling ? 'Sangat Tinggi' : 'Tinggi',
       status: 'Terdaftar - Menunggu Verifikasi Satgas',
       date: new Date().toISOString().split('T')[0],
-      threatDetail: reporterForm.threatDetail || 'Laporan Pengaduan Publik Siber Korban'
+      threatDetail: reporterForm.threatDetail || 'Laporan Pengaduan Publik Siber Korban',
+      evidenceCount: attachedEvidence.length,
+      evidence: attachedEvidence
     };
+
     setCampusCases([newCase, ...campusCases]);
-    setSubmittedTicket({ id: newId, alias: alias });
+    setSubmittedTicket({ 
+      id: newId, 
+      alias: alias,
+      isAnonymous: reporterForm.isAnonymous,
+      perpetratorInfo: perpDetails,
+      attachedEvidence: [...attachedEvidence]
+    });
     setReporterForm({
       campus: 'Universitas Indonesia',
       category: 'Kekerasan Seksual Berbasis Siber (KSBS)',
       threatDetail: '',
-      urgentCounseling: true
+      urgentCounseling: true,
+      isAnonymous: true,
+      reporterName: '',
+      reporterNim: '',
+      reporterFaculty: '',
+      reporterContact: '',
+      perpetratorStatus: 'Mahasiswa',
+      perpetratorPlatform: 'Instagram',
+      perpetratorName: '',
+      perpetratorFaculty: ''
     });
+    setAttachedEvidence([]);
   };
 
   // Handle Public Case Tracking
@@ -143,9 +220,10 @@ export default function CampusPrivacyCenter({
     setInvestigatorNoteInput('');
   };
 
-  const filteredCasesForInvestigator = selectedCampusFilter === 'Semua' 
-    ? campusCases 
-    : campusCases.filter(c => c.campus === selectedCampusFilter);
+  // Access control scoping: National Investigators see all campuses or filtered campus; Satgas PPKS Kampus see strictly their own campus.
+  const filteredCasesForInvestigator = ppksAuthSession?.isNationalInvestigator
+    ? (selectedCampusFilter === 'Semua' ? campusCases : campusCases.filter(c => c.campus === selectedCampusFilter))
+    : campusCases.filter(c => c.campus === (ppksAuthSession?.campus || 'Universitas Indonesia'));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -180,14 +258,14 @@ export default function CampusPrivacyCenter({
         alignItems: 'center',
         justifyContent: 'space-between',
         background: '#ffffff',
-        padding: '12px 18px',
-        borderRadius: '16px',
+        padding: '10px 16px',
+        borderRadius: '14px',
         border: '1px solid #cbd5e1',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
         flexWrap: 'wrap',
         gap: '12px'
       }}>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
           <button
             className={`btn ${activePortalTab === 'public' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => {
@@ -196,7 +274,7 @@ export default function CampusPrivacyCenter({
             }}
             style={{ padding: '8px 18px', fontSize: '13.5px', borderRadius: '10px' }}
           >
-            <User size={16} />
+            <UserCheck size={16} />
             <span>1. Portal Pelapor Publik & Korban</span>
           </button>
 
@@ -248,10 +326,16 @@ export default function CampusPrivacyCenter({
               {!submittedTicket ? (
                 <form onSubmit={handlePublicSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <p style={{ fontSize: '13px', color: '#475569' }}>
-                    Laporan ini akan langsung diteruskan ke <strong>Satgas PPKS Perguruan Tinggi</strong> terkait secara rahasia. Identitas asli Anda akan disamarkan menggunakan Alias Kriptografis.
+                    Laporan ini akan langsung diteruskan ke <strong>Satgas PPKS Perguruan Tinggi</strong> terkait secara rahasia. Wajib melampirkan bukti digital konkret.
                   </p>
 
-                  <div className="form-group">
+                  {/* Section 1: Detail Kampus & Insiden */}
+                  <div style={{ background: '#eff6ff', padding: '8px 12px', borderRadius: '8px', fontSize: '12.5px', color: '#1d4ed8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ background: '#2563eb', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', flexShrink: 0 }}>1</span>
+                    Detail Kampus & Insiden
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
                     <label className="form-label">Pilih Perguruan Tinggi (Kampus Anda)</label>
                     <select 
                       className="form-select"
@@ -265,7 +349,7 @@ export default function CampusPrivacyCenter({
                     </select>
                   </div>
 
-                  <div className="form-group">
+                  <div className="form-group" style={{ marginBottom: 0 }}>
                     <label className="form-label">Kategori Insiden / Pelanggaran</label>
                     <select 
                       className="form-select"
@@ -279,19 +363,186 @@ export default function CampusPrivacyCenter({
                     </select>
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Ringkasan Ancaman / Pelakunya (Opsional & Anonim)</label>
+                  {/* Perpetrator Disclosure Fields (Pengungkapan Terduga Pelaku) */}
+                  <div style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '14px', borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#991b1b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <ShieldAlert size={16} color="#dc2626" />
+                      <span>Pengungkapan Terduga Pelaku (Perpetrator Disclosure)</span>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ color: '#7f1d1d' }}>Status Terduga Pelaku</label>
+                      <select 
+                        className="form-select"
+                        value={reporterForm.perpetratorStatus}
+                        onChange={(e) => setReporterForm({ ...reporterForm, perpetratorStatus: e.target.value })}
+                      >
+                        <option>Mahasiswa (Satu Kampus)</option>
+                        <option>Dosen / Tenaga Kependidikan</option>
+                        <option>Pihak Luar Kampus / Akun Anonim Siber</option>
+                        <option>Pengurus / Anggota Organisasi</option>
+                        <option>Lainnya / Belum Pasti</option>
+                      </select>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr 1fr', gap: '10px' }}>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label" style={{ color: '#7f1d1d' }}>Platform Medsos</label>
+                        <select 
+                          className="form-select" 
+                          value={reporterForm.perpetratorPlatform}
+                          onChange={(e) => setReporterForm({ ...reporterForm, perpetratorPlatform: e.target.value })}
+                        >
+                          <option value="Instagram">Instagram</option>
+                          <option value="WhatsApp">WhatsApp</option>
+                          <option value="Telegram">Telegram</option>
+                          <option value="X (Twitter)">X (Twitter)</option>
+                          <option value="TikTok">TikTok</option>
+                          <option value="Facebook">Facebook</option>
+                          <option value="LinkedIn">LinkedIn</option>
+                          <option value="Discord">Discord</option>
+                          <option value="Line">Line</option>
+                          <option value="Darkweb / Forum Anonim">Darkweb / Forum Anonim</option>
+                          <option value="Lainnya">Lainnya</option>
+                        </select>
+                      </div>
+
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label" style={{ color: '#7f1d1d' }}>Nama / Akun Medsos Pelaku</label>
+                        <input 
+                          type="text" 
+                          className="form-input" 
+                          placeholder="Misal: Budi / @anon_user99" 
+                          value={reporterForm.perpetratorName}
+                          onChange={(e) => setReporterForm({ ...reporterForm, perpetratorName: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label" style={{ color: '#7f1d1d' }}>Fakultas / Instansi Pelaku</label>
+                        <input 
+                          type="text" 
+                          className="form-input" 
+                          placeholder="Misal: Fakultas Teknik / Tidak Tahu" 
+                          value={reporterForm.perpetratorFaculty}
+                          onChange={(e) => setReporterForm({ ...reporterForm, perpetratorFaculty: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">Ringkasan Ancaman & Kronologi Insiden</label>
                     <textarea 
                       className="form-input" 
                       rows={3}
-                      placeholder="Jelaskan secara ringkas insiden yang dialami (Misal: Terduga pelaku mengancam menyebarkan foto ke media sosial jika tidak menuruti permintaan)..."
+                      placeholder="Jelaskan secara rinci kronologi insiden yang dialami..."
                       value={reporterForm.threatDetail}
                       onChange={(e) => setReporterForm({ ...reporterForm, threatDetail: e.target.value })}
                       style={{ resize: 'vertical' }}
                     />
                   </div>
 
-                  <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                  {/* Section 2: Mandatory Concrete Evidence Upload */}
+                  <div style={{ background: '#ecfdf5', padding: '8px 12px', borderRadius: '8px', fontSize: '12.5px', color: '#047857', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ background: '#059669', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', flexShrink: 0 }}>2</span>
+                    Lampiran Bukti Digital Konkret (Wajib)
+                  </div>
+
+                  <div style={{ border: evidenceError ? '2px solid #dc2626' : '2px dashed #a7f3d0', borderRadius: '12px', padding: '16px', textAlign: 'center', background: '#f0fdf4', cursor: 'pointer', position: 'relative' }}>
+                    <input type="file" onChange={handleFileUpload} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0, cursor: 'pointer' }} />
+                    <UploadCloud size={28} color="#059669" style={{ margin: '0 auto 6px' }} />
+                    <h4 style={{ fontSize: '13.5px', fontWeight: 700, color: '#0f172a' }}>Unggah Bukti Digital (Screenshot Obrolan, Dokumen, Rekaman)</h4>
+                    <p style={{ fontSize: '11px', color: '#475569', marginTop: '2px' }}>Hash SHA-256 dikalkulasi otomatis client-side untuk admisibilitas Satgas.</p>
+                    {isHashing && <p style={{ marginTop: '6px', color: '#059669', fontWeight: 700, fontSize: '11.5px' }}>Mengalkulasi Hash SHA-256...</p>}
+                  </div>
+
+                  {evidenceError && (
+                    <div style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <AlertCircle size={15} style={{ flexShrink: 0 }} />
+                      <span>{evidenceError}</span>
+                    </div>
+                  )}
+
+                  {attachedEvidence.length > 0 && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div style={{ fontSize: '12px', fontWeight: 700, color: '#047857' }}>
+                        <Paperclip size={13} style={{ verticalAlign: 'middle' }} /> {attachedEvidence.length} bukti terlampir & terverifikasi:
+                      </div>
+                      {attachedEvidence.map(f => (
+                        <div key={f.id} style={{ background: '#ffffff', border: '1px solid #a7f3d0', padding: '8px 10px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{f.name}</div>
+                            <div style={{ fontSize: '10.5px', color: '#475569' }}>{f.size} • <span style={{ fontFamily: 'monospace', color: '#059669' }}>{f.sha256.substring(0, 12)}...</span></div>
+                          </div>
+                          <button type="button" onClick={() => handleRemoveEvidence(f.id)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8' }}><X size={15} /></button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Section 3: Anonymous Reporting Toggle & Identity Options */}
+                  <div style={{ background: '#f3e8ff', padding: '8px 12px', borderRadius: '8px', fontSize: '12.5px', color: '#6d28d9', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ background: '#7c3aed', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', flexShrink: 0 }}>3</span>
+                    Mode Identitas Pelapor & Pendampingan
+                  </div>
+
+                  <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px', color: '#334155' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={reporterForm.isAnonymous}
+                        onChange={(e) => setReporterForm({ ...reporterForm, isAnonymous: e.target.checked })}
+                      />
+                      <span><strong>Mode Pelaporan Anonim (Sembunyikan Identitas Saya dari Pelaku)</strong></span>
+                    </label>
+
+                    {reporterForm.isAnonymous ? (
+                      <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '10px 12px', borderRadius: '8px', fontSize: '12px', color: '#047857', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Lock size={16} style={{ flexShrink: 0 }} />
+                        <span><strong>🛡️ Mode Anonim Aktif:</strong> Identitas disamarkan otomatis dengan Alias Kriptografis (contoh: <code>Korban-STUDENT-8921</code>).</span>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', background: '#ffffff', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#1e293b' }}>Identitas Resmi Pelapor (Terverifikasi Kampus)</div>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                          <label className="form-label">Nama Lengkap Mahasiswa</label>
+                          <input 
+                            type="text" 
+                            className="form-input" 
+                            placeholder="Nama sesuai KTM" 
+                            required={!reporterForm.isAnonymous}
+                            value={reporterForm.reporterName} 
+                            onChange={(e) => setReporterForm({ ...reporterForm, reporterName: e.target.value })} 
+                          />
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                          <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label">NIM / NIP</label>
+                            <input 
+                              type="text" 
+                              className="form-input" 
+                              placeholder="2206..." 
+                              required={!reporterForm.isAnonymous}
+                              value={reporterForm.reporterNim} 
+                              onChange={(e) => setReporterForm({ ...reporterForm, reporterNim: e.target.value })} 
+                            />
+                          </div>
+                          <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label">No. WhatsApp / Contact</label>
+                            <input 
+                              type="text" 
+                              className="form-input" 
+                              placeholder="0812..." 
+                              required={!reporterForm.isAnonymous}
+                              value={reporterForm.reporterContact} 
+                              onChange={(e) => setReporterForm({ ...reporterForm, reporterContact: e.target.value })} 
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px', color: '#334155' }}>
                       <input 
                         type="checkbox" 
@@ -304,22 +555,30 @@ export default function CampusPrivacyCenter({
 
                   <button type="submit" className="btn btn-primary" style={{ padding: '12px' }}>
                     <ShieldCheck size={18} />
-                    <span>Kirim Laporan Kasus Terenkripsi Ke Satgas PPKS</span>
+                    <span>Kirim Laporan Kasus & Bukti Ke Satgas PPKS</span>
                   </button>
                 </form>
               ) : (
                 <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '24px', borderRadius: '12px', textAlign: 'center' }}>
                   <CheckCircle2 size={42} color="#059669" style={{ margin: '0 auto 10px' }} />
-                  <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#047857' }}>LAPORAN PPKS BERHASIL TERKIRIM</h4>
+                  <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#047857' }}>LAPORAN PPKS & BUKTI BERHASIL TERKIRIM</h4>
                   <p style={{ fontSize: '13px', color: '#475569', marginTop: '6px' }}>
-                    Laporan Anda telah terdaftar dan terenkripsi dengan aman dalam sistem Satgas PPKS Kampus.
+                    Laporan beserta {submittedTicket.attachedEvidence.length} bukti digital telah terdaftar dan terenkripsi dalam sistem Satgas PPKS.
                   </p>
 
-                  <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', padding: '14px', borderRadius: '8px', margin: '16px 0', textAlign: 'left' }}>
-                    <div style={{ fontSize: '12px', color: '#64748b' }}>Nomor Tiket Laporan Anda:</div>
-                    <div style={{ fontSize: '20px', fontWeight: 800, color: '#2563eb', fontFamily: 'monospace' }}>{submittedTicket.id}</div>
-                    <div style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>Alias Rahasia Korban:</div>
-                    <div style={{ fontSize: '15px', fontWeight: 700, color: '#6d28d9', fontFamily: 'monospace' }}>{submittedTicket.alias}</div>
+                  <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', padding: '14px', borderRadius: '8px', margin: '16px 0', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#64748b' }}>Nomor Tiket Laporan Anda:</div>
+                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#2563eb', fontFamily: 'monospace' }}>{submittedTicket.id}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#64748b' }}>Identitas Pelapor:</div>
+                      <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#6d28d9' }}>{submittedTicket.alias}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#64748b' }}>Terduga Pelaku Terlaporkan:</div>
+                      <div style={{ fontSize: '12.5px', color: '#991b1b', fontWeight: 700 }}>{submittedTicket.perpetratorInfo}</div>
+                    </div>
                   </div>
 
                   <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px' }}>
@@ -507,18 +766,24 @@ export default function CampusPrivacyCenter({
                   </h3>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '13px', color: '#475569', fontWeight: 600 }}>Filter Perguruan Tinggi:</span>
-                    <select 
-                      className="form-select" 
-                      style={{ width: 'auto', padding: '6px 12px' }}
-                      value={selectedCampusFilter}
-                      onChange={(e) => setSelectedCampusFilter(e.target.value)}
-                    >
-                      <option>Semua</option>
-                      <option>Universitas Indonesia</option>
-                      <option>Universitas Gadjah Mada</option>
-                      <option>Universitas Mataram</option>
-                    </select>
+                    <span style={{ fontSize: '13px', color: '#475569', fontWeight: 600 }}>Wilayah Pengawasan:</span>
+                    {ppksAuthSession?.isNationalInvestigator ? (
+                      <select 
+                        className="form-select" 
+                        style={{ width: 'auto', padding: '6px 12px' }}
+                        value={selectedCampusFilter}
+                        onChange={(e) => setSelectedCampusFilter(e.target.value)}
+                      >
+                        <option>Semua</option>
+                        <option>Universitas Indonesia</option>
+                        <option>Universitas Gadjah Mada</option>
+                        <option>Universitas Mataram</option>
+                      </select>
+                    ) : (
+                      <span className="badge badge-purple" style={{ fontSize: '12px' }}>
+                        🔒 Satgas Internal {ppksAuthSession.campus}
+                      </span>
+                    )}
                   </div>
                 </div>
 
