@@ -13,13 +13,13 @@ import {
   MapPin
 } from 'lucide-react';
 
-export default function Sidebar({ activeTab, setActiveTab }) {
+export default function Sidebar({ activeTab, setActiveTab, userRole }) {
   const menuItems = [
     { id: 'complaint', label: '1. Secure Complaint', icon: FileText, category: 'Layanan Pengaduan' },
     { id: 'victim', label: '2. Victim Shield Hub', icon: UserCheck, category: 'Layanan Pengaduan' },
     { id: 'breach', label: '3. AI Breach Monitoring', icon: Cpu, category: 'Deteksi & Bukti' },
     { id: 'vault', label: '4. Digital Evidence Vault', icon: Key, category: 'Deteksi & Bukti' },
-    { id: 'campus', label: '5. Campus Privacy Center', icon: GraduationCap, category: 'Institusi & Kampus' },
+    { id: 'campus', label: '5. Campus Privacy Center', icon: GraduationCap, category: 'Institusi & Kampus', badge: userRole === 'investigator' ? 'PPKS Desk' : null },
     { id: 'dashboard', label: '6. Data Compliance Index', icon: BarChart3, category: 'Kepatuhan & Rating' },
     { id: 'rating', label: '7. Institution Rating', icon: Award, category: 'Kepatuhan & Rating' },
     { id: 'consultation', label: '8. Legal Consultation', icon: MessageSquare, category: 'Edukasi & Konsultasi' },
@@ -56,9 +56,24 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                       key={item.id}
                       className={`nav-item ${isActive ? 'active' : ''}`}
                       onClick={() => setActiveTab(item.id)}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
                     >
-                      <Icon size={18} />
-                      <span>{item.label}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <Icon size={18} />
+                        <span>{item.label}</span>
+                      </div>
+                      {item.badge && (
+                        <span style={{ 
+                          fontSize: '10px', 
+                          background: '#7c3aed', 
+                          color: '#fff', 
+                          padding: '2px 6px', 
+                          borderRadius: '6px', 
+                          fontWeight: 700 
+                        }}>
+                          {item.badge}
+                        </span>
+                      )}
                     </div>
                   );
                 })}

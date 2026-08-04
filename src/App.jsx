@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
+import PPKSAuthModal from './components/PPKSAuthModal';
 
 import SecureComplaintCenter from './components/SecureComplaintCenter';
 import VictimProtectionHub from './components/VictimProtectionHub';
@@ -24,6 +25,19 @@ import {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('complaint');
+  const [userRole, setUserRole] = useState('public');
+
+  // Authenticated Satgas Session State
+  const [ppksAuthSession, setPpksAuthSession] = useState({
+    isAuthenticated: false,
+    officerName: '',
+    officerId: '',
+    campus: '',
+    roleTitle: '',
+    token: ''
+  });
+
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Shared State across modules
   const [complaints, setComplaints] = useState([
@@ -34,6 +48,36 @@ export default function App() {
   const [threatList, setThreatList] = useState(mockAIBreachThreats);
   const [campusCases, setCampusCases] = useState(mockCampusPPKSCases);
   const [institutions, setInstitutions] = useState(mockInstitutions);
+
+  const handleRequestInvestigatorMode = () => {
+    if (!ppksAuthSession.isAuthenticated) {
+      setIsAuthModalOpen(true);
+    } else {
+      setUserRole('investigator');
+      if (activeTab !== 'campus') {
+        setActiveTab('campus');
+      }
+    }
+  };
+
+  const handleAuthenticateSession = (sessionData) => {
+    setPpksAuthSession(sessionData);
+    setUserRole('investigator');
+    setIsAuthModalOpen(false);
+    setActiveTab('campus');
+  };
+
+  const handleLogoutSatgas = () => {
+    setPpksAuthSession({
+      isAuthenticated: false,
+      officerName: '',
+      officerId: '',
+      campus: '',
+      roleTitle: '',
+      token: ''
+    });
+    setUserRole('public');
+  };
 
   const renderActiveModule = () => {
     switch (activeTab) {
@@ -46,7 +90,17 @@ export default function App() {
       case 'vault':
         return <DigitalEvidenceVault />;
       case 'campus':
-        return <CampusPrivacyCenter campusCases={campusCases} setCampusCases={setCampusCases} />;
+        return (
+          <CampusPrivacyCenter 
+            campusCases={campusCases} 
+            setCampusCases={setCampusCases}
+            userRole={userRole}
+            setUserRole={setUserRole}
+            ppksAuthSession={ppksAuthSession}
+            onRequestAuth={() => setIsAuthModalOpen(true)}
+            onLogoutSatgas={handleLogoutSatgas}
+          />
+        );
       case 'dashboard':
         return <DataComplianceDashboard institutions={institutions} />;
       case 'rating':
@@ -64,13 +118,29 @@ export default function App() {
 
   return (
     <div className="app-container">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} userRole={userRole} />
       <div className="main-content">
-        <Header activeTab={activeTab} threatCount={threatList.filter(t => t.level === 'Critical').length} />
+        <Header 
+          activeTab={activeTab} 
+          threatCount={threatList.filter(t => t.level === 'Critical').length}
+          userRole={userRole}
+          setUserRole={setUserRole}
+          setActiveTab={setActiveTab}
+          ppksAuthSession={ppksAuthSession}
+          onRequestAuth={handleRequestInvestigatorMode}
+          onLogoutSatgas={handleLogoutSatgas}
+        />
         <main className="page-wrapper">
           {renderActiveModule()}
         </main>
       </div>
+
+      {/* Satgas Authentication & Verification Modal */}
+      <PPKSAuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onAuthenticate={handleAuthenticateSession}
+      />
     </div>
   );
 }
