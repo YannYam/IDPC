@@ -13,10 +13,9 @@ export default function Header({
 }) {
   const getTabTitle = () => {
     switch (activeTab) {
-      case 'complaint': return 'Secure Complaint Center (Pusat Pengaduan Aman)';
+      case 'complaint': return 'Pusat Pengaduan & Brankas Bukti Digital Terenkripsi';
       case 'victim': return 'Victim Protection Hub (Perlindungan Korban & KSBS)';
       case 'breach': return 'AI Data Breach Monitoring (Deteksi Dini Kebocoran)';
-      case 'vault': return 'Digital Evidence Vault (Brankas Bukti Digital Standard ISO)';
       case 'campus': return userRole === 'investigator' ? 'Campus Privacy Command Desk (Investigator Satgas PPKS)' : 'Campus Privacy Center (Portal Pelaporan Publik & PPKS)';
       case 'dashboard': return 'National Data Compliance Dashboard (Indeks PDP)';
       case 'rating': return 'Institution Privacy Rating (Rating Kepatuhan Institusi)';

@@ -6,7 +6,6 @@ import PPKSAuthModal from './components/PPKSAuthModal';
 import SecureComplaintCenter from './components/SecureComplaintCenter';
 import VictimProtectionHub from './components/VictimProtectionHub';
 import AIBreachMonitoring from './components/AIBreachMonitoring';
-import DigitalEvidenceVault from './components/DigitalEvidenceVault';
 import CampusPrivacyCenter from './components/CampusPrivacyCenter';
 import DataComplianceDashboard from './components/DataComplianceDashboard';
 import InstitutionPrivacyRating from './components/InstitutionPrivacyRating';
@@ -82,13 +81,17 @@ export default function App() {
   const renderActiveModule = () => {
     switch (activeTab) {
       case 'complaint':
-        return <SecureComplaintCenter complaints={complaints} setComplaints={setComplaints} />;
+        return (
+          <SecureComplaintCenter 
+            complaints={complaints} 
+            setComplaints={setComplaints}
+            ppksAuthSession={ppksAuthSession}
+          />
+        );
       case 'victim':
-        return <VictimProtectionHub />;
+        return <VictimProtectionHub setActiveTab={setActiveTab} />;
       case 'breach':
         return <AIBreachMonitoring threatList={threatList} setThreatList={setThreatList} />;
-      case 'vault':
-        return <DigitalEvidenceVault />;
       case 'campus':
         return (
           <CampusPrivacyCenter 
@@ -112,7 +115,13 @@ export default function App() {
       case 'map':
         return <NationalDataIncidentMap mapPoints={mockIncidentMapPoints} />;
       default:
-        return <SecureComplaintCenter complaints={complaints} setComplaints={setComplaints} />;
+        return (
+          <SecureComplaintCenter 
+            complaints={complaints} 
+            setComplaints={setComplaints}
+            ppksAuthSession={ppksAuthSession}
+          />
+        );
     }
   };
 

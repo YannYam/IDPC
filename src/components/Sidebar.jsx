@@ -1,10 +1,9 @@
 import React from 'react';
 import {
   ShieldCheck,
-  FileText,
+  FileLock2,
   UserCheck,
   Cpu,
-  Key,
   GraduationCap,
   BarChart3,
   Award,
@@ -15,19 +14,18 @@ import {
 
 export default function Sidebar({ activeTab, setActiveTab, userRole }) {
   const menuItems = [
-    { id: 'complaint', label: '1. Secure Complaint', icon: FileText, category: 'Layanan Pengaduan' },
+    { id: 'complaint', label: '1. Pengaduan & Bukti Digital', icon: FileLock2, category: 'Layanan Pengaduan' },
     { id: 'victim', label: '2. Victim Shield Hub', icon: UserCheck, category: 'Layanan Pengaduan' },
-    { id: 'breach', label: '3. AI Breach Monitoring', icon: Cpu, category: 'Deteksi & Bukti' },
-    { id: 'vault', label: '4. Digital Evidence Vault', icon: Key, category: 'Deteksi & Bukti' },
-    { id: 'campus', label: '5. Campus Privacy Center', icon: GraduationCap, category: 'Institusi & Kampus', badge: userRole === 'investigator' ? 'PPKS Desk' : null },
-    { id: 'dashboard', label: '6. Data Compliance Index', icon: BarChart3, category: 'Kepatuhan & Rating' },
-    { id: 'rating', label: '7. Institution Rating', icon: Award, category: 'Kepatuhan & Rating' },
-    { id: 'consultation', label: '8. Legal Consultation', icon: MessageSquare, category: 'Edukasi & Konsultasi' },
-    { id: 'learning', label: '9. Privacy Learning', icon: BookOpen, category: 'Edukasi & Konsultasi' },
-    { id: 'map', label: '10. Incident Map', icon: MapPin, category: 'Analisis Nasional' },
+    { id: 'breach', label: '3. AI Breach Monitoring', icon: Cpu, category: 'Deteksi & Analisis' },
+    { id: 'campus', label: '4. Campus Privacy Center', icon: GraduationCap, category: 'Institusi & Kampus', badge: userRole === 'investigator' ? 'PPKS Desk' : null },
+    { id: 'dashboard', label: '5. Data Compliance Index', icon: BarChart3, category: 'Kepatuhan & Rating' },
+    { id: 'rating', label: '6. Institution Rating', icon: Award, category: 'Kepatuhan & Rating' },
+    { id: 'consultation', label: '7. Legal Consultation', icon: MessageSquare, category: 'Edukasi & Konsultasi' },
+    { id: 'learning', label: '8. Privacy Learning', icon: BookOpen, category: 'Edukasi & Konsultasi' },
+    { id: 'map', label: '9. Incident Map', icon: MapPin, category: 'Analisis Nasional' },
   ];
 
-  const categories = ['Layanan Pengaduan', 'Deteksi & Bukti', 'Institusi & Kampus', 'Kepatuhan & Rating', 'Edukasi & Konsultasi', 'Analisis Nasional'];
+  const categories = ['Layanan Pengaduan', 'Deteksi & Analisis', 'Institusi & Kampus', 'Kepatuhan & Rating', 'Edukasi & Konsultasi', 'Analisis Nasional'];
 
   return (
     <aside className="sidebar">
