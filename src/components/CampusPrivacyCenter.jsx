@@ -47,6 +47,9 @@ export default function CampusPrivacyCenter({
     reporterNim: '',
     reporterFaculty: '',
     reporterContact: '',
+    contactPersonName: '',
+    contactPersonChannel: 'WhatsApp',
+    contactPersonDetail: '',
     perpetratorStatus: 'Mahasiswa',
     perpetratorPlatform: 'Instagram',
     perpetratorName: '',
@@ -130,6 +133,10 @@ export default function CampusPrivacyCenter({
 
     const perpDetails = `${reporterForm.perpetratorStatus}: ${reporterForm.perpetratorName || 'Tidak Sebut Nama'} [Platform: ${reporterForm.perpetratorPlatform}] (${reporterForm.perpetratorFaculty || 'N/A'})`;
 
+    const contactPersonInfo = reporterForm.contactPersonDetail
+      ? `${reporterForm.contactPersonName || 'Kontak Person'} [${reporterForm.contactPersonChannel}]: ${reporterForm.contactPersonDetail}`
+      : 'Tidak Dicantumkan';
+
     const newCase = {
       id: newId,
       campus: reporterForm.campus,
@@ -137,6 +144,7 @@ export default function CampusPrivacyCenter({
       victimAlias: alias,
       isAnonymous: reporterForm.isAnonymous,
       reporterContact: reporterForm.isAnonymous ? 'N/A (Anonim Sesi)' : reporterForm.reporterContact,
+      contactPerson: contactPersonInfo,
       perpetratorInfo: perpDetails,
       priority: reporterForm.urgentCounseling ? 'Sangat Tinggi' : 'Tinggi',
       status: 'Terdaftar - Menunggu Verifikasi Satgas',
@@ -164,6 +172,9 @@ export default function CampusPrivacyCenter({
       reporterNim: '',
       reporterFaculty: '',
       reporterContact: '',
+      contactPersonName: '',
+      contactPersonChannel: 'WhatsApp',
+      contactPersonDetail: '',
       perpetratorStatus: 'Mahasiswa',
       perpetratorPlatform: 'Instagram',
       perpetratorName: '',
@@ -534,32 +545,69 @@ export default function CampusPrivacyCenter({
                             onChange={(e) => setReporterForm({ ...reporterForm, reporterName: e.target.value })} 
                           />
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                          <div className="form-group" style={{ marginBottom: 0 }}>
-                            <label className="form-label">NIM / NIP</label>
-                            <input 
-                              type="text" 
-                              className="form-input" 
-                              placeholder="2206..." 
-                              required={!reporterForm.isAnonymous}
-                              value={reporterForm.reporterNim} 
-                              onChange={(e) => setReporterForm({ ...reporterForm, reporterNim: e.target.value })} 
-                            />
-                          </div>
-                          <div className="form-group" style={{ marginBottom: 0 }}>
-                            <label className="form-label">No. WhatsApp / Contact</label>
-                            <input 
-                              type="text" 
-                              className="form-input" 
-                              placeholder="0812..." 
-                              required={!reporterForm.isAnonymous}
-                              value={reporterForm.reporterContact} 
-                              onChange={(e) => setReporterForm({ ...reporterForm, reporterContact: e.target.value })} 
-                            />
-                          </div>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                          <label className="form-label">NIM / NIP Mahasiswa</label>
+                          <input 
+                            type="text" 
+                            className="form-input" 
+                            placeholder="2206..." 
+                            required={!reporterForm.isAnonymous}
+                            value={reporterForm.reporterNim} 
+                            onChange={(e) => setReporterForm({ ...reporterForm, reporterNim: e.target.value })} 
+                          />
                         </div>
                       </div>
                     )}
+
+                    {/* 1 Contact Person (WhatsApp / Social Media / Email) */}
+                    <div style={{ background: '#ffffff', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <div style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span>Kontak Person Darurat Pelapor (Optional)</span>
+                        <span className="badge badge-purple" style={{ fontSize: '10px' }}>WhatsApp / Medsos</span>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1.3fr', gap: '8px' }}>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                          <label className="form-label" style={{ fontSize: '11px' }}>Nama Kontak & Hubungan</label>
+                          <input 
+                            type="text" 
+                            className="form-input" 
+                            placeholder="Budi (Teman / Kerabat)" 
+                            style={{ padding: '6px 10px', fontSize: '12px' }}
+                            value={reporterForm.contactPersonName} 
+                            onChange={(e) => setReporterForm({ ...reporterForm, contactPersonName: e.target.value })} 
+                          />
+                        </div>
+
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                          <label className="form-label" style={{ fontSize: '11px' }}>Saluran Kontak</label>
+                          <select 
+                            className="form-select"
+                            style={{ padding: '6px 10px', fontSize: '12px' }}
+                            value={reporterForm.contactPersonChannel}
+                            onChange={(e) => setReporterForm({ ...reporterForm, contactPersonChannel: e.target.value })}
+                          >
+                            <option value="WhatsApp">WhatsApp</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="Telegram">Telegram</option>
+                            <option value="X (Twitter)">X (Twitter)</option>
+                            <option value="Email">Email</option>
+                            <option value="Telepon Seluler">Telepon Seluler</option>
+                          </select>
+                        </div>
+
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                          <label className="form-label" style={{ fontSize: '11px' }}>Detail No. / Username</label>
+                          <input 
+                            type="text" 
+                            className="form-input" 
+                            placeholder="0812... / @username" 
+                            style={{ padding: '6px 10px', fontSize: '12px' }}
+                            value={reporterForm.contactPersonDetail} 
+                            onChange={(e) => setReporterForm({ ...reporterForm, contactPersonDetail: e.target.value })} 
+                          />
+                        </div>
+                      </div>
+                    </div>
 
                     <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px', color: '#334155' }}>
                       <input 
@@ -887,6 +935,7 @@ export default function CampusPrivacyCenter({
                         <div><strong>Kategori:</strong> {selectedCaseForDetail.category}</div>
                         <div><strong>Alias Kriptografis Korban:</strong> <span style={{ fontFamily: 'monospace', color: '#6d28d9', fontWeight: 700 }}>{selectedCaseForDetail.victimAlias}</span></div>
                         <div><strong>Tanggal Registrasi:</strong> {selectedCaseForDetail.date}</div>
+                        <div><strong>Kontak Person Darurat Pelapor:</strong> {selectedCaseForDetail.contactPerson || 'Tidak Dicantumkan'}</div>
                         <div>
                           <strong>Investigator Penanggung Jawab:</strong>{' '}
                           {ppksAuthSession?.isNationalInvestigator ? (

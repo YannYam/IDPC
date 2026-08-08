@@ -101,7 +101,13 @@ export default function App() {
           />
         );
       case 'consultation':
-        return <LegalConsultationHub experts={mockLegalExperts} />;
+        return (
+          <LegalConsultationHub 
+            experts={mockLegalExperts} 
+            userRole={userRole}
+            ppksAuthSession={ppksAuthSession}
+          />
+        );
       case 'learning':
         return <PrivacyLearningCenter modules={mockLearningModules} />;
       default:

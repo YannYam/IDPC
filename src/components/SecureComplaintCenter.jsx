@@ -361,30 +361,17 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                         />
                       </div>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                        <div className="form-group" style={{ marginBottom: 0 }}>
-                          <label className="form-label">NIK (16 Digit)</label>
-                          <input 
-                            type="text" 
-                            className="form-input" 
-                            placeholder="32710..." 
-                            maxLength={16}
-                            required={!formData.isAnonymous}
-                            value={formData.reporterNik} 
-                            onChange={(e) => setFormData({ ...formData, reporterNik: e.target.value })} 
-                          />
-                        </div>
-                        <div className="form-group" style={{ marginBottom: 0 }}>
-                          <label className="form-label">No. WhatsApp / Email</label>
-                          <input 
-                            type="text" 
-                            className="form-input" 
-                            placeholder="0812... / email@..." 
-                            required={!formData.isAnonymous}
-                            value={formData.reporterContact} 
-                            onChange={(e) => setFormData({ ...formData, reporterContact: e.target.value })} 
-                          />
-                        </div>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label">NIK (16 Digit Pelapor)</label>
+                        <input 
+                          type="text" 
+                          className="form-input" 
+                          placeholder="32710..." 
+                          maxLength={16}
+                          required={!formData.isAnonymous}
+                          value={formData.reporterNik} 
+                          onChange={(e) => setFormData({ ...formData, reporterNik: e.target.value })} 
+                        />
                       </div>
 
                       <p style={{ fontSize: '11.5px', color: '#64748b', margin: 0 }}>

@@ -21,7 +21,7 @@ import {
   PhoneCall
 } from 'lucide-react';
 
-export default function LegalConsultationHub({ experts }) {
+export default function LegalConsultationHub({ experts, userRole, ppksAuthSession }) {
   // Queue & CS State Management
   const [queueTicket, setQueueTicket] = useState(null); // { ticketNo: 'K-014', topic: '...', status: 'waiting' | 'in_consultation' | 'completed', pos: 2, estWaitMinutes: 5 }
   const [currentServingTicket, setCurrentServingTicket] = useState('K-012');
@@ -36,7 +36,54 @@ export default function LegalConsultationHub({ experts }) {
   const [ratingFeedback, setRatingFeedback] = useState('');
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
 
-  // Active CS Agent & Chat Messages State
+  // CS Agents List & Add Modal State (Investigator National can add CS agent)
+  const [csAgentsList, setCsAgentsList] = useState([
+    {
+      id: 1,
+      name: 'Adv. Sarah Amalia, S.H., M.H.',
+      title: 'Senior CS Legal Specialist & Auditor PDP',
+      desk: 'Loket CS 01 (Layanan Umum & UU PDP)',
+      rating: '4.9/5.0',
+      status: 'Online - Live CS',
+      initials: 'SA',
+      avatarBg: '#eff6ff',
+      avatarColor: '#2563eb'
+    },
+    {
+      id: 2,
+      name: 'Dr. Hendra Gunawan, S.H., LL.M.',
+      title: 'Pakar Hukum Siber & Sengketa Doxxing',
+      desk: 'Loket CS 02 (Doxxing & Kebocoran Data)',
+      rating: '4.9/5.0',
+      status: 'Online - Live CS',
+      initials: 'HG',
+      avatarBg: '#f0fdf4',
+      avatarColor: '#16a34a'
+    },
+    {
+      id: 3,
+      name: 'Adv. Maya Kusuma, S.H.',
+      title: 'Konsultan LBH PPKS Kampus & KSBS',
+      desk: 'Loket CS 03 (Pendampingan KSBS Korban)',
+      rating: '4.8/5.0',
+      status: 'Online - Live CS',
+      initials: 'MK',
+      avatarBg: '#fdf4ff',
+      avatarColor: '#c026d3'
+    },
+    {
+      id: 4,
+      name: 'Adv. Rizky Pratama, S.H.',
+      title: 'Spesialis Somasi & Sanksi Pidana UU PDP',
+      desk: 'Loket CS 04 (Litigasi & Somasi)',
+      rating: '4.9/5.0',
+      status: 'Online - Live CS',
+      initials: 'RP',
+      avatarBg: '#fff7ed',
+      avatarColor: '#ea580c'
+    }
+  ]);
+
   const [activeCSAgent, setActiveCSAgent] = useState({
     id: 1,
     name: 'Adv. Sarah Amalia, S.H., M.H.',
@@ -44,9 +91,57 @@ export default function LegalConsultationHub({ experts }) {
     desk: 'Loket CS 01 (Layanan Umum & UU PDP)',
     rating: '4.9/5.0',
     status: 'Online - Live CS',
+    initials: 'SA',
     avatarBg: '#eff6ff',
     avatarColor: '#2563eb'
   });
+
+  const [showAddCSAgentModal, setShowAddCSAgentModal] = useState(false);
+  const [newCSAgentForm, setNewCSAgentForm] = useState({
+    name: '',
+    title: 'Spesialis CS Legal IDPC+',
+    desk: 'Loket CS 05 (Konsultasi PDP)',
+    rating: '5.0/5.0',
+    status: 'Online - Live CS'
+  });
+
+  const handleAddCSAgent = (e) => {
+    e.preventDefault();
+    if (!newCSAgentForm.name.trim()) return;
+    const names = newCSAgentForm.name.trim().split(' ');
+    const initials = names.length >= 2 ? (names[0][0] + names[1][0]).toUpperCase() : names[0].substring(0, 2).toUpperCase();
+    const colors = [
+      { bg: '#eff6ff', color: '#2563eb' },
+      { bg: '#f0fdf4', color: '#16a34a' },
+      { bg: '#fdf4ff', color: '#c026d3' },
+      { bg: '#fff7ed', color: '#ea580c' },
+      { bg: '#f0f9ff', color: '#0284c7' }
+    ];
+    const pickedColor = colors[csAgentsList.length % colors.length];
+
+    const newAgent = {
+      id: Date.now(),
+      name: newCSAgentForm.name,
+      title: newCSAgentForm.title,
+      desk: newCSAgentForm.desk,
+      rating: newCSAgentForm.rating,
+      status: newCSAgentForm.status,
+      initials: initials,
+      avatarBg: pickedColor.bg,
+      avatarColor: pickedColor.color
+    };
+
+    setCsAgentsList([...csAgentsList, newAgent]);
+    setActiveCSAgent(newAgent);
+    setShowAddCSAgentModal(false);
+    setNewCSAgentForm({
+      name: '',
+      title: 'Spesialis CS Legal IDPC+',
+      desk: `Loket CS 0${csAgentsList.length + 2} (Konsultasi PDP)`,
+      rating: '5.0/5.0',
+      status: 'Online - Live CS'
+    });
+  };
 
   const [chatMessages, setChatMessages] = useState([
     {
@@ -342,31 +437,67 @@ export default function LegalConsultationHub({ experts }) {
           </div>
         </div>
 
-        {/* Card 3: Petugas CS On-Duty */}
-        <div className="card">
-          <div className="card-header">
+        {/* Card 3: Petugas CS & Pakar On-Duty (Multi CS Agents) */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div className="card-header" style={{ marginBottom: 0 }}>
             <h3 className="card-title" style={{ fontSize: '14px', color: '#475569' }}>
               <Users size={16} color="#059669" />
               <span>Petugas CS & Pakar On-Duty</span>
             </h3>
-            <span className="badge badge-emerald">4 CS Online</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span className="badge badge-emerald">{csAgentsList.length} CS Online</span>
+              {(ppksAuthSession?.isNationalInvestigator || userRole === 'investigator') && (
+                <button 
+                  className="btn btn-primary" 
+                  style={{ padding: '4px 8px', fontSize: '11px', background: '#7c3aed' }}
+                  onClick={() => setShowAddCSAgentModal(true)}
+                  title="Tambah Petugas CS / Pakar On-Duty Baru (Hak Akses Investigator Nasional)"
+                >
+                  <Plus size={13} />
+                  <span>Tambah CS</span>
+                </button>
+              )}
+            </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ background: activeCSAgent.avatarBg, color: activeCSAgent.avatarColor, width: '42px', height: '42px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '16px' }}>
-              SA
-            </div>
-            <div style={{ flex: 1, overflow: 'hidden' }}>
-              <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {activeCSAgent.name}
-              </div>
-              <div style={{ fontSize: '11.5px', color: '#0284c7', fontWeight: 600 }}>
-                {activeCSAgent.title}
-              </div>
-              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
-                ⭐ {activeCSAgent.rating} • {activeCSAgent.desk}
-              </div>
-            </div>
+          {/* List of CS Agents */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }}>
+            {csAgentsList.map((agent) => {
+              const isActive = activeCSAgent?.id === agent.id;
+              return (
+                <div 
+                  key={agent.id}
+                  onClick={() => setActiveCSAgent(agent)}
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '10px', 
+                    padding: '8px 10px', 
+                    borderRadius: '8px', 
+                    background: isActive ? '#eff6ff' : '#f8fafc',
+                    border: isActive ? '1.5px solid #2563eb' : '1px solid #e2e8f0',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <div style={{ background: agent.avatarBg, color: agent.avatarColor, width: '34px', height: '34px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '12.5px', flexShrink: 0 }}>
+                    {agent.initials}
+                  </div>
+                  <div style={{ flex: 1, overflow: 'hidden' }}>
+                    <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span>{agent.name}</span>
+                      {isActive && <span style={{ fontSize: '9.5px', background: '#2563eb', color: '#fff', padding: '1px 6px', borderRadius: '4px' }}>Aktif Chat</span>}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#0284c7', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {agent.title}
+                    </div>
+                    <div style={{ fontSize: '10.5px', color: '#64748b' }}>
+                      ⭐ {agent.rating} • {agent.desk}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -449,77 +580,149 @@ export default function LegalConsultationHub({ experts }) {
           ))}
         </div>
 
-        {/* Chat Messages Body Display */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '14px', background: '#ffffff' }}>
-          {chatMessages.map((msg) => (
-            <div
-              key={msg.id}
-              style={{
-                alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-                maxWidth: '75%',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: msg.sender === 'user' ? 'flex-end' : 'flex-start'
+        {/* Chat Messages Body & Queue Lock State Machine */}
+        {!queueTicket ? (
+          /* State 1: No Ticket Taken */
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', padding: '32px', textAlign: 'center' }}>
+            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '20px', borderRadius: '50%', marginBottom: '16px', color: '#0284c7' }}>
+              <Headphones size={44} />
+            </div>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', marginBottom: '6px' }}>
+              🔒 Sesi Chat CS Terkunci
+            </h3>
+            <p style={{ fontSize: '13.5px', color: '#64748b', maxWidth: '480px', lineHeight: '1.5', marginBottom: '20px' }}>
+              Anda wajib mengambil nomor antrean CS terlebih dahulu untuk dapat memulai sesi konsultasi live dengan Petugas CS Legal IDPC+.
+            </p>
+            <button 
+              className="btn btn-primary" 
+              style={{ background: '#0284c7', color: '#ffffff', padding: '12px 24px', fontWeight: 700, borderRadius: '12px', boxShadow: '0 4px 14px rgba(2, 132, 199, 0.25)' }}
+              onClick={() => setShowTakeQueueModal(true)}
+            >
+              <Plus size={18} />
+              <span>Ambil Nomor Antrean CS Sekarang</span>
+            </button>
+          </div>
+        ) : queueTicket.status === 'waiting' ? (
+          /* State 2: In Waiting Queue */
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#fffbe6', padding: '32px', textAlign: 'center', border: '1px solid #ffe58f' }}>
+            <div style={{ background: '#fef3c7', border: '1px solid #fde68a', padding: '20px', borderRadius: '50%', marginBottom: '16px', color: '#d97706' }}>
+              <Clock size={44} className="spin-slow" />
+            </div>
+            <span className="badge badge-amber" style={{ fontSize: '12px', padding: '4px 12px', marginBottom: '10px' }}>
+              ⏳ Menunggu Giliran Antrean: {queueTicket.ticketNo}
+            </span>
+            <h3 style={{ fontSize: '19px', fontWeight: 800, color: '#92400e', marginBottom: '6px' }}>
+              Anda Berada di Urutan Ke-{queueTicket.pos} dalam Antrean
+            </h3>
+            <p style={{ fontSize: '13.5px', color: '#78350f', maxWidth: '520px', lineHeight: '1.5', marginBottom: '16px' }}>
+              Petugas CS sedang melayani nomor antrean <strong>{currentServingTicket}</strong>. Chat CS akan terbuka otomatis dalam <strong>~{queueTicket.estWaitMinutes} Menit</strong> ketika giliran antrean Anda dipanggil.
+            </p>
+
+            <button 
+              className="btn" 
+              style={{ background: '#d97706', color: '#ffffff', padding: '10px 20px', fontWeight: 700, borderRadius: '10px', fontSize: '12.5px', marginTop: '8px' }}
+              onClick={() => {
+                setQueueTicket(prev => prev ? { ...prev, pos: 0, estWaitMinutes: 0, status: 'in_consultation' } : null);
+                setCurrentServingTicket(queueTicket.ticketNo);
               }}
             >
-              <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '3px', fontWeight: 600 }}>
-                {msg.sender === 'user' ? 'Anda (Pelapor)' : msg.agentName} • {msg.time}
-              </div>
-              <div
-                style={{
-                  padding: '12px 16px',
-                  borderRadius: msg.sender === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                  background: msg.sender === 'user' ? 'linear-gradient(135deg, #0284c7, #0369a1)' : '#f1f5f9',
-                  color: msg.sender === 'user' ? '#ffffff' : '#0f172a',
-                  fontSize: '13.5px',
-                  lineHeight: '1.5',
-                  boxShadow: msg.sender === 'user' ? '0 2px 8px rgba(2, 132, 199, 0.2)' : 'none',
-                  border: msg.sender === 'user' ? 'none' : '1px solid #e2e8f0'
-                }}
+              <Sparkles size={16} />
+              <span>⚡ Panggil Antrean Saya Sekarang (Simulasi CS Live)</span>
+            </button>
+          </div>
+        ) : queueTicket.status === 'completed' ? (
+          /* State 3: Consultation Finished */
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f0fdf4', padding: '32px', textAlign: 'center' }}>
+            <CheckCircle2 size={48} color="#16a34a" style={{ marginBottom: '12px' }} />
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#166534' }}>
+              Sesi CS Konsultasi Telah Selesai
+            </h3>
+            <p style={{ fontSize: '13px', color: '#365314', maxWidth: '440px', marginBottom: '16px' }}>
+              Terima kasih telah berkonsultasi dengan Petugas CS Legal IDPC+. Nomor antrean {queueTicket.ticketNo} telah selesai diproses.
+            </p>
+            <button 
+              className="btn btn-primary" 
+              onClick={() => setShowTakeQueueModal(true)}
+            >
+              <Plus size={16} />
+              <span>Ambil Antrean Konsultasi Baru</span>
+            </button>
+          </div>
+        ) : (
+          /* State 4: In Consultation (Active Live Chat Unlocked) */
+          <>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '14px', background: '#ffffff' }}>
+              {chatMessages.map((msg) => (
+                <div
+                  key={msg.id}
+                  style={{
+                    alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                    maxWidth: '75%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: msg.sender === 'user' ? 'flex-end' : 'flex-start'
+                  }}
+                >
+                  <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '3px', fontWeight: 600 }}>
+                    {msg.sender === 'user' ? 'Anda (Pelapor)' : msg.agentName} • {msg.time}
+                  </div>
+                  <div
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: msg.sender === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                      background: msg.sender === 'user' ? 'linear-gradient(135deg, #0284c7, #0369a1)' : '#f1f5f9',
+                      color: msg.sender === 'user' ? '#ffffff' : '#0f172a',
+                      fontSize: '13.5px',
+                      lineHeight: '1.5',
+                      boxShadow: msg.sender === 'user' ? '0 2px 8px rgba(2, 132, 199, 0.2)' : 'none',
+                      border: msg.sender === 'user' ? 'none' : '1px solid #e2e8f0'
+                    }}
+                  >
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+
+              {isAgentTyping && (
+                <div style={{ alignSelf: 'flex-start', background: '#f1f5f9', padding: '10px 14px', borderRadius: '12px', fontSize: '12px', color: '#64748b', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <RefreshCw size={12} className="spin" />
+                  <span>Petugas CS {activeCSAgent.name} sedang mengetik tanggapan hukum...</span>
+                </div>
+              )}
+            </div>
+
+            {/* Input Chat Control Box */}
+            <form onSubmit={handleSendMessage} style={{ background: '#f8fafc', padding: '12px 16px', borderTop: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button 
+                type="button" 
+                className="btn btn-secondary" 
+                style={{ padding: '10px' }}
+                onClick={() => alert(`Lampiran berkas bukti digital dapat diunggah melalui menu '1. Pengaduan & Bukti Digital' untuk validasi hash SHA-256.`)}
+                title="Lampirkan Berkas Bukti"
               >
-                {msg.text}
-              </div>
-            </div>
-          ))}
+                <Paperclip size={18} color="#64748b" />
+              </button>
 
-          {isAgentTyping && (
-            <div style={{ alignSelf: 'flex-start', background: '#f1f5f9', padding: '10px 14px', borderRadius: '12px', fontSize: '12px', color: '#64748b', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <RefreshCw size={12} className="spin" />
-              <span>Petugas CS {activeCSAgent.name} sedang mengetik tanggapan hukum...</span>
-            </div>
-          )}
-        </div>
+              <input 
+                type="text" 
+                className="form-input" 
+                placeholder="Tulis pesan pertanyaan atau konsultasi CS Hukum Anda di sini..."
+                value={inputMsg}
+                onChange={(e) => setInputMsg(e.target.value)}
+                style={{ flex: 1, padding: '10px 14px', borderRadius: '10px', fontSize: '13.5px' }}
+              />
 
-        {/* Input Chat Control Box */}
-        <form onSubmit={handleSendMessage} style={{ background: '#f8fafc', padding: '12px 16px', borderTop: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <button 
-            type="button" 
-            className="btn btn-secondary" 
-            style={{ padding: '10px' }}
-            onClick={() => alert(`Lampiran berkas bukti digital dapat diunggah melalui menu '1. Pengaduan & Bukti Digital' untuk validasi hash SHA-256.`)}
-            title="Lampirkan Berkas Bukti"
-          >
-            <Paperclip size={18} color="#64748b" />
-          </button>
-
-          <input 
-            type="text" 
-            className="form-input" 
-            placeholder="Tulis pesan pertanyaan atau konsultasi CS Hukum Anda di sini..."
-            value={inputMsg}
-            onChange={(e) => setInputMsg(e.target.value)}
-            style={{ flex: 1, padding: '10px 14px', borderRadius: '10px', fontSize: '13.5px' }}
-          />
-
-          <button 
-            type="submit" 
-            className="btn" 
-            style={{ background: '#0284c7', color: '#ffffff', padding: '10px 18px', borderRadius: '10px' }}
-          >
-            <Send size={16} />
-            <span>Kirim</span>
-          </button>
-        </form>
+              <button 
+                type="submit" 
+                className="btn" 
+                style={{ background: '#0284c7', color: '#ffffff', padding: '10px 18px', borderRadius: '10px' }}
+              >
+                <Send size={16} />
+                <span>Kirim</span>
+              </button>
+            </form>
+          </>
+        )}
       </div>
 
       {/* Modal Ambil Nomor Antrean CS Konsultasi Baru */}
@@ -633,6 +836,87 @@ export default function LegalConsultationHub({ experts }) {
                 </p>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal Tambah Petugas CS / Pakar On-Duty Baru (Khusus Investigator Nasional) */}
+      {showAddCSAgentModal && (
+        <div className="modal-overlay" style={{ zIndex: 1200 }}>
+          <div className="modal-card" style={{ maxWidth: '500px', padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '16.5px', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Users size={18} color="#7c3aed" />
+                <span>Tambah Petugas CS & Pakar On-Duty Baru</span>
+              </h3>
+              <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }} onClick={() => setShowAddCSAgentModal(false)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddCSAgent} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ background: '#f3e8ff', border: '1px solid #d8b4fe', padding: '10px 12px', borderRadius: '8px', fontSize: '12px', color: '#6d28d9', fontWeight: 600 }}>
+                🛡️ <strong>Hak Akses Investigator Nasional:</strong> Menambahkan CS Agent / Pakar Hukum ke registri layanan konsultasi live.
+              </div>
+
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label">Nama Lengkap & Gelar Pakar/CS</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="Misal: Adv. Budi Santoso, S.H., M.H." 
+                  required
+                  value={newCSAgentForm.name} 
+                  onChange={(e) => setNewCSAgentForm({ ...newCSAgentForm, name: e.target.value })} 
+                />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label">Jabatan & Spesialisasi Legal</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="Spesialis CS Legal & Pendampingan UU PDP" 
+                  value={newCSAgentForm.title} 
+                  onChange={(e) => setNewCSAgentForm({ ...newCSAgentForm, title: e.target.value })} 
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label">Penugasan Loket Desk</label>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    placeholder="Loket CS 05 (Khusus Kampus)" 
+                    value={newCSAgentForm.desk} 
+                    onChange={(e) => setNewCSAgentForm({ ...newCSAgentForm, desk: e.target.value })} 
+                  />
+                </div>
+
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label">Status Duty</label>
+                  <select 
+                    className="form-select"
+                    value={newCSAgentForm.status}
+                    onChange={(e) => setNewCSAgentForm({ ...newCSAgentForm, status: e.target.value })}
+                  >
+                    <option value="Online - Live CS">Online - Live CS</option>
+                    <option value="Standby Loket">Standby Loket</option>
+                    <option value="Konsultasi Khusus">Konsultasi Khusus</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setShowAddCSAgentModal(false)}>
+                  Batal
+                </button>
+                <button type="submit" className="btn" style={{ flex: 1, background: '#7c3aed', color: '#ffffff', fontWeight: 700 }}>
+                  Daftarkan CS Agent
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
