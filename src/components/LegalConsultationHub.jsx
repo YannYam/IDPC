@@ -107,6 +107,10 @@ export default function LegalConsultationHub({ experts, userRole, ppksAuthSessio
 
   const handleAddCSAgent = (e) => {
     e.preventDefault();
+    if (!ppksAuthSession?.isNationalInvestigator) {
+      alert('Akses Ditolak: Hanya Investigator Nasional yang memiliki wewenang mendaftarkan Petugas CS / Pakar baru.');
+      return;
+    }
     if (!newCSAgentForm.name.trim()) return;
     const names = newCSAgentForm.name.trim().split(' ');
     const initials = names.length >= 2 ? (names[0][0] + names[1][0]).toUpperCase() : names[0].substring(0, 2).toUpperCase();
@@ -446,15 +450,15 @@ export default function LegalConsultationHub({ experts, userRole, ppksAuthSessio
             </h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span className="badge badge-emerald">{csAgentsList.length} CS Online</span>
-              {(ppksAuthSession?.isNationalInvestigator || userRole === 'investigator') && (
+              {ppksAuthSession?.isNationalInvestigator && (
                 <button 
                   className="btn btn-primary" 
                   style={{ padding: '4px 8px', fontSize: '11px', background: '#7c3aed' }}
                   onClick={() => setShowAddCSAgentModal(true)}
-                  title="Tambah Petugas CS / Pakar On-Duty Baru (Hak Akses Investigator Nasional)"
+                  title="Tambah Petugas CS / Pakar On-Duty Baru (Khusus Hak Akses Investigator Nasional)"
                 >
                   <Plus size={13} />
-                  <span>Tambah CS</span>
+                  <span>+ Tambah CS (Nasional)</span>
                 </button>
               )}
             </div>
