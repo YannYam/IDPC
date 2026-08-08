@@ -7,17 +7,13 @@ import SecureComplaintCenter from './components/SecureComplaintCenter';
 import VictimProtectionHub from './components/VictimProtectionHub';
 import AIBreachMonitoring from './components/AIBreachMonitoring';
 import CampusPrivacyCenter from './components/CampusPrivacyCenter';
-import DataComplianceDashboard from './components/DataComplianceDashboard';
-import InstitutionPrivacyRating from './components/InstitutionPrivacyRating';
 import LegalConsultationHub from './components/LegalConsultationHub';
 import PrivacyLearningCenter from './components/PrivacyLearningCenter';
-import NationalDataIncidentMap from './components/NationalDataIncidentMap';
 
 import { 
   mockInstitutions, 
   mockAIBreachThreats, 
   mockCampusPPKSCases, 
-  mockIncidentMapPoints, 
   mockLegalExperts, 
   mockLearningModules 
 } from './data/mockData';
@@ -40,8 +36,8 @@ export default function App() {
 
   // Shared State across modules
   const [complaints, setComplaints] = useState([
-    { id: 1, ticketCode: 'IDPC-CRYPT-8942', category: 'Kebocoran Data Pribadi (Data Leak)', entity: 'PT Ecommerce Megastore Indo', date: '2026-07-27', status: 'Investigasi Formal IDPC', isAnonymous: true, encrypted: true },
-    { id: 2, ticketCode: 'IDPC-CRYPT-4120', category: 'Penyalahgunaan NIK & KTP', entity: 'Pinjol Ilegal Megah', date: '2026-07-26', status: 'Audit Kepatuhan', isAnonymous: true, encrypted: true }
+    { id: 1, ticketCode: 'IDPC-CRYPT-8942', category: 'Kebocoran Data Pribadi (Data Leak)', entity: 'PT Ecommerce Megastore Indo', date: '2026-07-27', status: 'Investigasi Formal IDPC', isAnonymous: true, encrypted: true, assignedInvestigator: 'Dr. H. Bambang Soetopo, S.H., M.H.', investigationStartedAt: '27 Jul 2026, 10:15 WIB', contactPerson: 'Budi (Kakak) [WhatsApp]: 08123456789' },
+    { id: 2, ticketCode: 'IDPC-CRYPT-4120', category: 'Penyalahgunaan NIK & KTP', entity: 'Pinjol Ilegal Megah', date: '2026-07-26', status: 'Audit Kepatuhan', isAnonymous: true, encrypted: true, assignedInvestigator: 'Dr. H. Bambang Soetopo, S.H., M.H.', investigationStartedAt: '26 Jul 2026, 16:40 WIB', contactPerson: '@dina_ig (Instagram Kerabat)' }
   ]);
 
   const [threatList, setThreatList] = useState(mockAIBreachThreats);
@@ -104,16 +100,10 @@ export default function App() {
             onLogoutSatgas={handleLogoutSatgas}
           />
         );
-      case 'dashboard':
-        return <DataComplianceDashboard institutions={institutions} />;
-      case 'rating':
-        return <InstitutionPrivacyRating institutions={institutions} />;
       case 'consultation':
         return <LegalConsultationHub experts={mockLegalExperts} />;
       case 'learning':
         return <PrivacyLearningCenter modules={mockLearningModules} />;
-      case 'map':
-        return <NationalDataIncidentMap mapPoints={mockIncidentMapPoints} />;
       default:
         return (
           <SecureComplaintCenter 

@@ -183,6 +183,8 @@ export default function CampusPrivacyCenter({
   // Handle Investigator Case Creation
   const handleCreateCampusCase = (e) => {
     e.preventDefault();
+    const nowTs = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) + ' WIB';
+    const officer = ppksAuthSession?.officerName || 'Satgas PPKS Kampus';
     const newCase = {
       id: `PPKS-2026-00${campusCases.length + 1}`,
       campus: newCaseForm.campus,
@@ -190,7 +192,9 @@ export default function CampusPrivacyCenter({
       victimAlias: newCaseForm.victimAlias,
       priority: newCaseForm.priority,
       status: 'Dalam Penanganan Satgas PPKS',
-      date: new Date().toISOString().split('T')[0]
+      date: new Date().toISOString().split('T')[0],
+      assignedInvestigator: officer,
+      investigationStartedAt: nowTs
     };
     setCampusCases([newCase, ...campusCases]);
     setShowNewCaseModal(false);
@@ -198,14 +202,28 @@ export default function CampusPrivacyCenter({
 
   // Handle Investigator Status Change
   const handleUpdateStatus = (caseId, newStatus) => {
+    const nowTs = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) + ' WIB';
+    const officer = ppksAuthSession?.officerName || 'Satgas PPKS Kampus';
     setCampusCases(campusCases.map(item => {
       if (item.id === caseId) {
-        return { ...item, status: newStatus };
+        return { 
+          ...item, 
+          status: newStatus,
+          assignedInvestigator: officer,
+          investigationStartedAt: item.investigationStartedAt || nowTs,
+          lastUpdatedStatusAt: nowTs
+        };
       }
       return item;
     }));
     if (selectedCaseForDetail && selectedCaseForDetail.id === caseId) {
-      setSelectedCaseForDetail(prev => ({ ...prev, status: newStatus }));
+      setSelectedCaseForDetail(prev => ({ 
+        ...prev, 
+        status: newStatus,
+        assignedInvestigator: officer,
+        investigationStartedAt: prev.investigationStartedAt || nowTs,
+        lastUpdatedStatusAt: nowTs
+      }));
     }
   };
 
@@ -795,6 +813,7 @@ export default function CampusPrivacyCenter({
                         <th>Perguruan Tinggi</th>
                         <th>Kategori Kasus Siber</th>
                         <th>Alias Kripto Korban</th>
+                        <th>Penanggung Jawab (Satgas)</th>
                         <th>Prioritas</th>
                         <th>Status Kasus Saat Ini</th>
                         <th>Aksi Investigator</th>
@@ -807,6 +826,22 @@ export default function CampusPrivacyCenter({
                           <td style={{ fontWeight: 600, color: '#0f172a' }}>{item.campus}</td>
                           <td style={{ fontSize: '13px' }}>{item.category}</td>
                           <td style={{ fontFamily: 'monospace', color: '#6d28d9', fontWeight: 700 }}>{item.victimAlias}</td>
+                          <td style={{ fontSize: '12px', fontWeight: 600, color: '#0f172a' }}>
+                            {ppksAuthSession?.isNationalInvestigator ? (
+                              <>
+                                <div>👤 {item.assignedInvestigator || 'Belum Ditugaskan'}</div>
+                                {item.investigationStartedAt && (
+                                  <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 400, marginTop: '2px' }}>
+                                    ⏰ {item.investigationStartedAt}
+                                  </div>
+                                )}
+                              </>
+                            ) : (
+                              <span className="badge badge-purple" style={{ fontSize: '11px' }}>
+                                🔒 Terproteksi (Akses Investigator Nasional)
+                              </span>
+                            )}
+                          </td>
                           <td>
                             <span className={`badge ${item.priority === 'Sangat Tinggi' ? 'badge-rose' : 'badge-amber'}`}>
                               {item.priority}
@@ -852,6 +887,18 @@ export default function CampusPrivacyCenter({
                         <div><strong>Kategori:</strong> {selectedCaseForDetail.category}</div>
                         <div><strong>Alias Kriptografis Korban:</strong> <span style={{ fontFamily: 'monospace', color: '#6d28d9', fontWeight: 700 }}>{selectedCaseForDetail.victimAlias}</span></div>
                         <div><strong>Tanggal Registrasi:</strong> {selectedCaseForDetail.date}</div>
+                        <div>
+                          <strong>Investigator Penanggung Jawab:</strong>{' '}
+                          {ppksAuthSession?.isNationalInvestigator ? (
+                            <span style={{ fontWeight: 700, color: '#7c3aed' }}>👤 {selectedCaseForDetail.assignedInvestigator || 'Belum Ditugaskan'}</span>
+                          ) : (
+                            <span style={{ fontSize: '12px', color: '#64748b', fontStyle: 'italic' }}>🔒 Disembunyikan (Hanya Dapat Dilihat oleh Investigator Nasional)</span>
+                          )}
+                        </div>
+                        <div><strong>Waktu Mulai Penanganan:</strong> ⏰ {selectedCaseForDetail.investigationStartedAt || selectedCaseForDetail.date}</div>
+                        {selectedCaseForDetail.lastUpdatedStatusAt && (
+                          <div><strong>Waktu Perubahan Status:</strong> ⏰ {selectedCaseForDetail.lastUpdatedStatusAt}</div>
+                        )}
                       </div>
 
                       <div style={{ marginTop: '16px' }}>

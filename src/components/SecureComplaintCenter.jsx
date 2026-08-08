@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, Shield, Send, CheckCircle2, AlertCircle, FileLock2, KeyRound, Key, ShieldCheck, FileCheck, UploadCloud, FileText, Download, Layers, X, Paperclip, User, Phone, Share2, Info, UserX } from 'lucide-react';
+import { Lock, Shield, Send, CheckCircle2, AlertCircle, FileLock2, KeyRound, Key, ShieldCheck, FileCheck, UploadCloud, FileText, Download, Layers, X, Paperclip, User, Phone, Share2, Info, UserX, UserCheck } from 'lucide-react';
 
 export default function SecureComplaintCenter({ complaints, setComplaints, ppksAuthSession }) {
   const [activeSection, setActiveSection] = useState('form');
@@ -16,6 +16,9 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
     reporterName: '',
     reporterNik: '',
     reporterContact: '',
+    contactPersonName: '',
+    contactPersonChannel: 'WhatsApp',
+    contactPersonDetail: '',
     encryptPayload: true,
   });
   const [attachedEvidence, setAttachedEvidence] = useState([]);
@@ -73,6 +76,10 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
     const socialInfo = formData.perpetratorSocial ? `[${formData.perpetratorPlatform}] ${formData.perpetratorSocial}` : '';
     const perpFullDetails = `${formData.reportedEntity} ${formData.perpetratorPhone ? '• HP: ' + formData.perpetratorPhone : ''} ${socialInfo ? '• ' + socialInfo : ''}`;
 
+    const contactPersonInfo = formData.contactPersonDetail 
+      ? `${formData.contactPersonName || 'Kontak Person'} [${formData.contactPersonChannel}]: ${formData.contactPersonDetail}` 
+      : 'Tidak Dicantumkan';
+
     const newComplaint = {
       id: Date.now(), 
       ticketCode: randomTicket, 
@@ -88,6 +95,7 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
       isAnonymous: formData.isAnonymous,
       reporterIdentity: reporterInfo,
       reporterContact: formData.isAnonymous ? 'N/A (Sesi Anonim)' : formData.reporterContact,
+      contactPerson: contactPersonInfo,
       encrypted: formData.encryptPayload, 
       evidenceCount: attachedEvidence.length,
       evidence: attachedEvidence
@@ -108,7 +116,10 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
       reporterName: '',
       reporterNik: '',
       reporterContact: '',
-      encryptPayload: true 
+      contactPersonName: '',
+      contactPersonChannel: 'WhatsApp',
+      contactPersonDetail: '',
+      encryptPayload: true
     });
     setAttachedEvidence([]);
   };
@@ -382,6 +393,61 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                     </div>
                   )}
 
+                  {/* 1 Contact Person (WhatsApp / Social Media / Email) */}
+                  <div style={{ background: '#ffffff', padding: '14px', borderRadius: '10px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '4px' }}>
+                    <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Phone size={15} color="#0284c7" />
+                        <span>Kontak Person Darurat / Penanggung Jawab Pelapor</span>
+                      </span>
+                      <span className="badge badge-purple" style={{ fontSize: '10px' }}>Opsional / Channel Pilihan</span>
+                    </div>
+                    <p style={{ fontSize: '11.5px', color: '#64748b', margin: 0 }}>
+                      Cantumkan 1 (satu) kontak person terdekat (teman, kerabat, pendamping, atau akun medsos) yang dapat dihubungi jika investigator membutuhkan komunikasi langsung.
+                    </p>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1.3fr', gap: '10px' }}>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label">Nama Kontak Person & Hubungan</label>
+                        <input 
+                          type="text" 
+                          className="form-input" 
+                          placeholder="Misal: Budi (Kakak / Kerabat)" 
+                          value={formData.contactPersonName} 
+                          onChange={(e) => setFormData({ ...formData, contactPersonName: e.target.value })} 
+                        />
+                      </div>
+
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label">Saluran Kontak</label>
+                        <select 
+                          className="form-select"
+                          value={formData.contactPersonChannel}
+                          onChange={(e) => setFormData({ ...formData, contactPersonChannel: e.target.value })}
+                        >
+                          <option value="WhatsApp">WhatsApp</option>
+                          <option value="Instagram">Instagram</option>
+                          <option value="Telegram">Telegram</option>
+                          <option value="X (Twitter)">X (Twitter)</option>
+                          <option value="Email">Email</option>
+                          <option value="Telepon Seluler">Telepon Seluler</option>
+                          <option value="Lainnya">Lainnya</option>
+                        </select>
+                      </div>
+
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label">Detail Nomor / Username Medsos</label>
+                        <input 
+                          type="text" 
+                          className="form-input" 
+                          placeholder="0812... / @username" 
+                          value={formData.contactPersonDetail} 
+                          onChange={(e) => setFormData({ ...formData, contactPersonDetail: e.target.value })} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13.5px', color: '#334155' }}>
                     <input type="checkbox" checked={formData.encryptPayload} onChange={(e) => setFormData({ ...formData, encryptPayload: e.target.checked })} />
                     <span>Enkripsi Kriptografis AES-256 pada Muatan Berkas (Payload)</span>
@@ -532,63 +598,70 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
           {isAuthorized && ppksAuthSession?.isNationalInvestigator ? (
             <>
               <div className="card" style={{ border: '1px solid #ddd6fe' }}>
-              <div className="card-header">
-                <h3 className="card-title"><Shield size={20} color="#7c3aed" /><span>Registri Pengaduan Masuk (Audit IDPC)</span></h3>
-                <span className="badge badge-purple">{complaints.length} Berkas Active</span>
-              </div>
-              <div style={{ background: '#f3e8ff', padding: '10px 14px', borderRadius: '8px', fontSize: '12px', color: '#6d28d9', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <ShieldCheck size={15} /><span>Sesi terverifikasi sebagai <strong>{ppksAuthSession.officerName}</strong> — Semua akses tercatat dalam log audit IDPC.</span>
-              </div>
-              <div style={{ overflowX: 'auto' }}>
-                <table className="custom-table">
-                  <thead>
-                    <tr>
-                      <th>No. Tiket</th>
-                      <th>Identitas Pelapor</th>
-                      <th>Kategori</th>
-                      <th>Institusi / Pelaku Terlapor</th>
-                      <th>Tanggal</th>
-                      <th>Bukti</th>
-                      <th>Status IDPC</th>
-                      <th>Aksi Investigator</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {complaints.map(item => (
-                      <tr key={item.id}>
-                        <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#2563eb' }}>{item.ticketCode}</td>
-                        <td>
-                          {item.isAnonymous ? (
-                            <span className="badge badge-emerald" style={{ fontSize: '11px' }}>
-                              🛡️ {item.reporterIdentity || 'PELAPOR-ANON (Terenskripsi)'}
-                            </span>
-                          ) : (
-                            <span className="badge badge-blue" style={{ fontSize: '11px' }}>
-                              👤 {item.reporterIdentity || 'Terverifikasi ID'}
-                            </span>
-                          )}
-                        </td>
-                        <td style={{ fontSize: '12.5px' }}>{item.category}</td>
-                        <td style={{ color: '#0f172a', fontWeight: 600 }}>{item.perpetratorFullSummary || item.entity}</td>
-                        <td style={{ fontSize: '12px', color: '#475569' }}>{item.date}</td>
-                        <td><span className="badge badge-emerald" style={{ fontSize: '11px' }}>{item.evidenceCount || '1'} Berkas</span></td>
-                        <td><span className="badge badge-amber">{item.status}</span></td>
-                        <td>
-                          <button 
-                            className="btn btn-primary" 
-                            style={{ padding: '4px 10px', fontSize: '11.5px' }}
-                            onClick={() => setSelectedComplaintDetail(item)}
-                          >
-                            <FileText size={13} />
-                            <span>Detail Pengaduan</span>
-                          </button>
-                        </td>
+                <div className="card-header">
+                  <h3 className="card-title"><Shield size={20} color="#7c3aed" /><span>Registri Pengaduan Masuk (Audit IDPC)</span></h3>
+                  <span className="badge badge-purple">{complaints.length} Berkas Active</span>
+                </div>
+                <div style={{ background: '#f3e8ff', padding: '10px 14px', borderRadius: '8px', fontSize: '12px', color: '#6d28d9', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <ShieldCheck size={15} /><span>Sesi terverifikasi sebagai <strong>{ppksAuthSession.officerName}</strong> — Semua akses tercatat dalam log audit IDPC.</span>
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="custom-table">
+                    <thead>
+                      <tr>
+                        <th>No. Tiket</th>
+                        <th>Identitas Pelapor</th>
+                        <th>Kategori</th>
+                        <th>Institusi / Pelaku Terlapor</th>
+                        <th>Tanggal</th>
+                        <th>Penanggung Jawab (Investigator)</th>
+                        <th>Status IDPC</th>
+                        <th>Aksi Investigator</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {complaints.map(item => (
+                        <tr key={item.id}>
+                          <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#2563eb' }}>{item.ticketCode}</td>
+                          <td>
+                            {item.isAnonymous ? (
+                              <span className="badge badge-emerald" style={{ fontSize: '11px' }}>
+                                🛡️ {item.reporterIdentity || 'PELAPOR-ANON (Terenskripsi)'}
+                              </span>
+                            ) : (
+                              <span className="badge badge-blue" style={{ fontSize: '11px' }}>
+                                👤 {item.reporterIdentity || 'Terverifikasi ID'}
+                              </span>
+                            )}
+                          </td>
+                          <td style={{ fontSize: '12.5px' }}>{item.category}</td>
+                          <td style={{ color: '#0f172a', fontWeight: 600 }}>{item.perpetratorFullSummary || item.entity}</td>
+                          <td style={{ fontSize: '12px', color: '#475569' }}>{item.date}</td>
+                          <td style={{ fontSize: '12px', fontWeight: 600, color: '#0f172a' }}>
+                            <div>👤 {item.assignedInvestigator || <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Belum Ditugaskan</span>}</div>
+                            {item.investigationStartedAt && (
+                              <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 400, marginTop: '2px' }}>
+                                ⏰ {item.investigationStartedAt}
+                              </div>
+                            )}
+                          </td>
+                          <td><span className="badge badge-amber">{item.status}</span></td>
+                          <td>
+                            <button 
+                              className="btn btn-primary" 
+                              style={{ padding: '4px 10px', fontSize: '11.5px' }}
+                              onClick={() => setSelectedComplaintDetail(item)}
+                            >
+                              <FileText size={13} />
+                              <span>Detail Pengaduan</span>
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
 
             {/* Investigator Detailed Complaint Inspection Modal */}
             {selectedComplaintDetail && (
@@ -623,6 +696,21 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                       <span className="badge badge-purple" style={{ fontSize: '12px' }}>{selectedComplaintDetail.status}</span>
                     </div>
 
+                    {/* Investigator Assignment & Handling Metadata Box */}
+                    <div style={{ background: '#f5f3ff', border: '1px solid #ddd6fe', padding: '14px', borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#6d28d9', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <UserCheck size={16} color="#7c3aed" />
+                        <span>Otoritas Penanganan Kasus & Timestamp Audit IDPC</span>
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#3730a3', lineHeight: '1.6' }}>
+                        <div><strong>Investigator Penanggung Jawab:</strong> {selectedComplaintDetail.assignedInvestigator || <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Belum Ditugaskan</span>}</div>
+                        <div><strong>Waktu Mulai Penanganan:</strong> {selectedComplaintDetail.investigationStartedAt || <span style={{ color: '#94a3b8' }}>-</span>}</div>
+                        {selectedComplaintDetail.investigationCompletedAt && (
+                          <div><strong>Waktu Kasus Selesai:</strong> {selectedComplaintDetail.investigationCompletedAt}</div>
+                        )}
+                      </div>
+                    </div>
+
                     {/* Perpetrator Disclosure Box */}
                     <div style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '14px', borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#991b1b', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -644,8 +732,9 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                         <span>Identitas Pelapor & Kontak Korban</span>
                       </div>
                       <div style={{ fontSize: '13px', color: '#1e3a8a' }}>
-                        <div><strong>Identitas:</strong> {selectedComplaintDetail.reporterIdentity}</div>
+                        <div><strong>Identitas:</strong> {selectedComplaintDetail.reporterIdentity || (selectedComplaintDetail.isAnonymous ? 'PELAPOR-ANON (Terenskripsi Sesi Zero-Knowledge)' : 'Identitas Terverifikasi ID')}</div>
                         <div><strong>Kontak Pelapor:</strong> {selectedComplaintDetail.reporterContact || 'N/A (Anonim Sesi)'}</div>
+                        <div><strong>Kontak Person Darurat / Penanggung Jawab:</strong> {selectedComplaintDetail.contactPerson || 'Tidak Dicantumkan'}</div>
                         <div><strong>Enkripsi Payload:</strong> {selectedComplaintDetail.encrypted ? '🔒 Zero-Knowledge Encrypted Payload' : 'Standar'}</div>
                       </div>
                     </div>
@@ -679,9 +768,21 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                         className="btn btn-primary" 
                         style={{ flex: 1 }}
                         onClick={() => {
-                          const updated = complaints.map(c => c.id === selectedComplaintDetail.id ? { ...c, status: 'Investigasi Formal IDPC' } : c);
+                          const nowTs = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) + ' WIB';
+                          const officer = ppksAuthSession?.officerName || 'Investigator Utama IDPC';
+                          const updated = complaints.map(c => c.id === selectedComplaintDetail.id ? { 
+                            ...c, 
+                            status: 'Investigasi Formal IDPC',
+                            assignedInvestigator: c.assignedInvestigator || officer,
+                            investigationStartedAt: c.investigationStartedAt || nowTs
+                          } : c);
                           setComplaints(updated);
-                          setSelectedComplaintDetail({ ...selectedComplaintDetail, status: 'Investigasi Formal IDPC' });
+                          setSelectedComplaintDetail(prev => ({ 
+                            ...prev, 
+                            status: 'Investigasi Formal IDPC',
+                            assignedInvestigator: prev.assignedInvestigator || officer,
+                            investigationStartedAt: prev.investigationStartedAt || nowTs
+                          }));
                         }}
                       >
                         <ShieldCheck size={16} />
@@ -691,9 +792,23 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                         className="btn btn-secondary" 
                         style={{ flex: 1, color: '#059669', borderColor: '#a7f3d0' }}
                         onClick={() => {
-                          const updated = complaints.map(c => c.id === selectedComplaintDetail.id ? { ...c, status: 'Selesai - Terverifikasi' } : c);
+                          const nowTs = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) + ' WIB';
+                          const officer = ppksAuthSession?.officerName || 'Investigator Utama IDPC';
+                          const updated = complaints.map(c => c.id === selectedComplaintDetail.id ? { 
+                            ...c, 
+                            status: 'Selesai - Terverifikasi',
+                            assignedInvestigator: c.assignedInvestigator || officer,
+                            investigationStartedAt: c.investigationStartedAt || nowTs,
+                            investigationCompletedAt: nowTs
+                          } : c);
                           setComplaints(updated);
-                          setSelectedComplaintDetail({ ...selectedComplaintDetail, status: 'Selesai - Terverifikasi' });
+                          setSelectedComplaintDetail(prev => ({ 
+                            ...prev, 
+                            status: 'Selesai - Terverifikasi',
+                            assignedInvestigator: prev.assignedInvestigator || officer,
+                            investigationStartedAt: prev.investigationStartedAt || nowTs,
+                            investigationCompletedAt: nowTs
+                          }));
                         }}
                       >
                         <CheckCircle2 size={16} />

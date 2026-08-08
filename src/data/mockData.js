@@ -19,9 +19,9 @@ export const mockAIBreachThreats = [
 ];
 
 export const mockCampusPPKSCases = [
-  { id: "PPKS-2026-001", campus: "Universitas Indonesia", category: "Doxxing & Penyebaran Konten Tanpa Konsen", victimAlias: "Korban-A92", priority: "Sangat Tinggi", status: "Penyelidikan Satgas", date: "2026-07-25" },
-  { id: "PPKS-2026-002", campus: "Universitas Gadjah Mada", category: "Pelecehan Seksual Berbasis Siber (KSBS)", victimAlias: "Korban-B44", priority: "Tinggi", status: "Pendampingan Hukum", date: "2026-07-22" },
-  { id: "PPKS-2026-003", campus: "Universitas Mataram", category: "Pengancaman Pembocoran Data Pribadi", victimAlias: "Korban-C11", priority: "Sangat Tinggi", status: "Proteksi Identitas Aktif", date: "2026-07-20" }
+  { id: "PPKS-2026-001", campus: "Universitas Indonesia", category: "Doxxing & Penyebaran Konten Tanpa Konsen", victimAlias: "Korban-A92", priority: "Sangat Tinggi", status: "Penyelidikan Satgas", date: "2026-07-25", assignedInvestigator: "Dr. Rina Wijaya, S.H., M.H.", investigationStartedAt: "25 Jul 2026, 09:30 WIB" },
+  { id: "PPKS-2026-002", campus: "Universitas Gadjah Mada", category: "Pelecehan Seksual Berbasis Siber (KSBS)", victimAlias: "Korban-B44", priority: "Tinggi", status: "Pendampingan Hukum", date: "2026-07-22", assignedInvestigator: "Prof. Dr. Hendra K., M.Si.", investigationStartedAt: "22 Jul 2026, 14:15 WIB" },
+  { id: "PPKS-2026-003", campus: "Universitas Mataram", category: "Pengancaman Pembocoran Data Pribadi", victimAlias: "Korban-C11", priority: "Sangat Tinggi", status: "Proteksi Identitas Aktif", date: "2026-07-20", assignedInvestigator: "Dr. Ahmad Zaini, S.H.", investigationStartedAt: "20 Jul 2026, 11:00 WIB" }
 ];
 
 export const mockIncidentMapPoints = [
