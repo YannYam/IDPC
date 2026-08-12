@@ -46,6 +46,7 @@ export default function CampusPrivacyCenter({
     reporterName: '',
     reporterNim: '',
     reporterFaculty: '',
+    reporterInstitution: '',
     reporterContact: '',
     contactPersonName: '',
     contactPersonChannel: 'WhatsApp',
@@ -143,6 +144,7 @@ export default function CampusPrivacyCenter({
       category: reporterForm.category,
       victimAlias: alias,
       isAnonymous: reporterForm.isAnonymous,
+      reporterInstitution: reporterForm.isAnonymous ? 'N/A (Sesi Anonim)' : (reporterForm.reporterInstitution || reporterForm.campus || 'Tidak Dicantumkan'),
       reporterContact: reporterForm.isAnonymous ? 'N/A (Anonim Sesi)' : reporterForm.reporterContact,
       contactPerson: contactPersonInfo,
       perpetratorInfo: perpDetails,
@@ -171,6 +173,7 @@ export default function CampusPrivacyCenter({
       reporterName: '',
       reporterNim: '',
       reporterFaculty: '',
+      reporterInstitution: '',
       reporterContact: '',
       contactPersonName: '',
       contactPersonChannel: 'WhatsApp',
@@ -554,6 +557,16 @@ export default function CampusPrivacyCenter({
                             required={!reporterForm.isAnonymous}
                             value={reporterForm.reporterNim} 
                             onChange={(e) => setReporterForm({ ...reporterForm, reporterNim: e.target.value })} 
+                          />
+                        </div>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                          <label className="form-label">Nama Perusahaan / Institusi / Perguruan Tinggi Pelapor</label>
+                          <input 
+                            type="text" 
+                            className="form-input" 
+                            placeholder="Misal: Universitas Indonesia / PT Telekomunikasi" 
+                            value={reporterForm.reporterInstitution} 
+                            onChange={(e) => setReporterForm({ ...reporterForm, reporterInstitution: e.target.value })} 
                           />
                         </div>
                       </div>

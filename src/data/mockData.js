@@ -1,16 +1,3 @@
-export const mockInstitutions = [
-  { id: 1, name: "Kementerian Komunikasi dan Informatika", sector: "Kementerian", complianceScore: 92, ratingLetter: "AAA", dpo: "Dr. Pratama Persadha", status: "Terverifikasi" },
-  { id: 2, name: "Kementerian Kesehatan RI", sector: "Kementerian", complianceScore: 84, ratingLetter: "AA", dpo: "Ir. Setiaji, S.T., M.Si", status: "Terverifikasi" },
-  { id: 3, name: "Universitas Indonesia (UI)", sector: "Universitas", complianceScore: 88, ratingLetter: "AA", dpo: "Prof. Dr. Ir. Riri Fitri Sari", status: "Terverifikasi" },
-  { id: 4, name: "Universitas Gadjah Mada (UGM)", sector: "Universitas", complianceScore: 91, ratingLetter: "AAA", dpo: "Dr. Wing Wahyu Winarno", status: "Terverifikasi" },
-  { id: 5, name: "PT Bank Rakyat Indonesia (Persero) Tbk", sector: "BUMN", complianceScore: 96, ratingLetter: "AAA", dpo: "Arga M. Nugraha", status: "Terverifikasi" },
-  { id: 6, name: "PT Telkom Indonesia Tbk", sector: "BUMN", complianceScore: 90, ratingLetter: "AAA", dpo: "Fajrin Rasyid", status: "Terverifikasi" },
-  { id: 7, name: "Pemerintah Provinsi DKI Jakarta", sector: "Pemda", complianceScore: 78, ratingLetter: "A", dpo: "Budi Arie Setiadi", status: "Audit Berkala" },
-  { id: 8, name: "Pemerintah Kota Surabaya", sector: "Pemda", complianceScore: 82, ratingLetter: "AA", dpo: "M. Fikser", status: "Terverifikasi" },
-  { id: 9, name: "PT Ecommerce Megastore Indo", sector: "Swasta", complianceScore: 65, ratingLetter: "B", dpo: "Andi Wijaya", status: "Peringatan Dini" },
-  { id: 10, name: "Universitas Mataram (UNRAM)", sector: "Universitas", complianceScore: 85, ratingLetter: "AA", dpo: "Dr. Ahmad Zaini", status: "Terverifikasi" }
-];
-
 export const mockAIBreachThreats = [
   { id: 101, domain: "kemkes.go.id", source: "RaidForums Darknet Post", records: "1.2 Million Patients", level: "Critical", detectedAt: "2026-07-28 09:12 UTC", status: "Early Warning Dispatched" },
   { id: 102, domain: "univ-xyz.ac.id", source: "Exposed S3 Bucket Index", records: "45,000 Student Records", level: "High", detectedAt: "2026-07-27 22:45 UTC", status: "Institution Notified" },
@@ -22,15 +9,6 @@ export const mockCampusPPKSCases = [
   { id: "PPKS-2026-001", campus: "Universitas Indonesia", category: "Doxxing & Penyebaran Konten Tanpa Konsen", victimAlias: "Korban-A92", priority: "Sangat Tinggi", status: "Penyelidikan Satgas", date: "2026-07-25", assignedInvestigator: "Dr. Rina Wijaya, S.H., M.H.", investigationStartedAt: "25 Jul 2026, 09:30 WIB" },
   { id: "PPKS-2026-002", campus: "Universitas Gadjah Mada", category: "Pelecehan Seksual Berbasis Siber (KSBS)", victimAlias: "Korban-B44", priority: "Tinggi", status: "Pendampingan Hukum", date: "2026-07-22", assignedInvestigator: "Prof. Dr. Hendra K., M.Si.", investigationStartedAt: "22 Jul 2026, 14:15 WIB" },
   { id: "PPKS-2026-003", campus: "Universitas Mataram", category: "Pengancaman Pembocoran Data Pribadi", victimAlias: "Korban-C11", priority: "Sangat Tinggi", status: "Proteksi Identitas Aktif", date: "2026-07-20", assignedInvestigator: "Dr. Ahmad Zaini, S.H.", investigationStartedAt: "20 Jul 2026, 11:00 WIB" }
-];
-
-export const mockIncidentMapPoints = [
-  { id: 1, province: "DKI Jakarta", city: "Jakarta Selatan", sector: "Keuangan & BUMN", count: 42, lat: -6.2088, lng: 106.8456, risk: "Tinggi" },
-  { id: 2, province: "Jawa Barat", city: "Bandung", sector: "Perguruan Tinggi", count: 28, lat: -6.9175, lng: 107.6191, risk: "Sedang" },
-  { id: 3, province: "Jawa Timur", city: "Surabaya", sector: "Pemerintahan Daerah", count: 35, lat: -7.2575, lng: 112.7521, risk: "Tinggi" },
-  { id: 4, province: "Nusa Tenggara Barat", city: "Mataram / Lombok", sector: "Pariwisata & Edukasi", count: 14, lat: -8.5833, lng: 116.1167, risk: "Rendah" },
-  { id: 5, province: "Sulawesi Selatan", city: "Makassar", sector: "Layanan Kesehatan", count: 21, lat: -5.1477, lng: 119.4327, risk: "Sedang" },
-  { id: 6, province: "Sumatera Utara", city: "Medan", sector: "Korporasi Swasta", count: 30, lat: 3.5952, lng: 98.6722, risk: "Tinggi" }
 ];
 
 export const mockLegalExperts = [

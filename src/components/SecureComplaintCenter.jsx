@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, Shield, Send, CheckCircle2, AlertCircle, FileLock2, KeyRound, Key, ShieldCheck, FileCheck, UploadCloud, FileText, Download, Layers, X, Paperclip, User, Phone, Share2, Info, UserX, UserCheck } from 'lucide-react';
+import { Lock, Shield, Send, CheckCircle2, AlertCircle, FileLock2, KeyRound, Key, ShieldCheck, UploadCloud, FileText, X, Paperclip, User, Phone, UserX, UserCheck } from 'lucide-react';
 
 export default function SecureComplaintCenter({ complaints, setComplaints, ppksAuthSession }) {
   const [activeSection, setActiveSection] = useState('form');
@@ -15,6 +15,7 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
     isAnonymous: true,
     reporterName: '',
     reporterNik: '',
+    reporterInstitution: '',
     reporterContact: '',
     contactPersonName: '',
     contactPersonChannel: 'WhatsApp',
@@ -25,7 +26,7 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
   const [isHashing, setIsHashing] = useState(false);
   const [evidenceError, setEvidenceError] = useState('');
   const [submittedTicket, setSubmittedTicket] = useState(null);
-  const [selectedFileForCert, setSelectedFileForCert] = useState(null);
+
   const [selectedComplaintDetail, setSelectedComplaintDetail] = useState(null);
 
   const isAuthorized = ppksAuthSession && ppksAuthSession.isAuthenticated;
@@ -94,6 +95,7 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
       status: 'Terdaftar - Audit IDPC', 
       isAnonymous: formData.isAnonymous,
       reporterIdentity: reporterInfo,
+      reporterInstitution: formData.isAnonymous ? 'N/A (Sesi Anonim)' : (formData.reporterInstitution || 'Tidak Dicantumkan'),
       reporterContact: formData.isAnonymous ? 'N/A (Sesi Anonim)' : formData.reporterContact,
       contactPerson: contactPersonInfo,
       encrypted: formData.encryptPayload, 
@@ -374,6 +376,17 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                         />
                       </div>
 
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label">Nama Perusahaan / Institusi / Perguruan Tinggi Pelapor</label>
+                        <input 
+                          type="text" 
+                          className="form-input" 
+                          placeholder="Misal: PT Teknologi Nusantara / Universitas Indonesia" 
+                          value={formData.reporterInstitution} 
+                          onChange={(e) => setFormData({ ...formData, reporterInstitution: e.target.value })} 
+                        />
+                      </div>
+
                       <p style={{ fontSize: '11.5px', color: '#64748b', margin: 0 }}>
                         🔒 Identitas Anda disimpang dengan enkripsi AES-256 dan hanya dapat diakses oleh investigator PPKS resmi.
                       </p>
@@ -497,51 +510,23 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
 
           {/* Right Panel */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {/* Certificate Viewer */}
-            <div className="card">
-              <div className="card-header">
-                <h3 className="card-title"><ShieldCheck size={20} color="#059669" /><span>Sertifikat Legal Keabsahan Bukti</span></h3>
-                <span className="badge badge-emerald">UU ITE Pasal 5 & 6</span>
-              </div>
-              {selectedFileForCert ? (
-                <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '12px', padding: '20px' }}>
-                  <div style={{ textAlign: 'center', marginBottom: '16px', borderBottom: '1px dashed #a7f3d0', paddingBottom: '12px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#047857' }}>SERTIFIKAT INTEGRITAS BUKTI DIGITAL IDPC+</h4>
-                    <p style={{ fontSize: '11px', color: '#475569', textTransform: 'uppercase', letterSpacing: '1px' }}>Nomor Sertifikat: CERT-IDPC-{selectedFileForCert.id}</p>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#0f172a' }}>
-                    <div><strong>Nama Berkas:</strong> <span style={{ color: '#1d4ed8' }}>{selectedFileForCert.name}</span></div>
-                    <div><strong>Ukuran:</strong> {selectedFileForCert.size}</div>
-                    <div><strong>Stempel Waktu:</strong> <span style={{ fontFamily: 'monospace' }}>{selectedFileForCert.timestamp}</span></div>
-                    <div><strong>SHA-256:</strong><div style={{ background: '#fff', padding: '6px', borderRadius: '6px', fontSize: '10px', fontFamily: 'monospace', color: '#047857', wordBreak: 'break-all', marginTop: '4px', border: '1px solid #cbd5e1' }}>{selectedFileForCert.sha256}</div></div>
-                  </div>
-                  <button className="btn btn-primary" style={{ width: '100%', marginTop: '14px' }} onClick={() => alert('Sertifikat Keabsahan Legal IDPC+ telah disiap unduh sebagai PDF resmi.')}><Download size={16} /><span>Unduh Sertifikat PDF Resmi</span></button>
-                </div>
-              ) : (
-                <div style={{ textAlign: 'center', padding: '30px 16px', color: '#64748b' }}>
-                  <FileCheck size={36} style={{ margin: '0 auto 8px', opacity: 0.5 }} />
-                  <p style={{ fontSize: '13px' }}>Lampirkan bukti digital pada formulir, lalu klik "Lihat Sertifikat" untuk melihat Sertifikat Keabsahan Hukumnya.</p>
-                </div>
-              )}
-            </div>
-
             {/* Attached Evidence Table */}
             {attachedEvidence.length > 0 && (
               <div className="card">
                 <div className="card-header">
-                  <h3 className="card-title"><FileText size={20} color="#7c3aed" /><span>Berkas Bukti Terlampir</span></h3>
-                  <span className="badge badge-purple">{attachedEvidence.length} Berkas</span>
+                  <h3 className="card-title"><FileText size={20} color="#7c3aed" /><span>Berkas Bukti Terlampir & Verifikasi SHA-256</span></h3>
+                  <span className="badge badge-purple">{attachedEvidence.length} Berkas Terverifikasi</span>
                 </div>
                 <div style={{ overflowX: 'auto' }}>
                   <table className="custom-table">
-                    <thead><tr><th>Nama Berkas</th><th>SHA-256</th><th>Waktu</th><th>Aksi</th></tr></thead>
+                    <thead><tr><th>Nama Berkas</th><th>Hash SHA-256</th><th>Stempel Waktu</th><th>Status</th></tr></thead>
                     <tbody>
                       {attachedEvidence.map(file => (
                         <tr key={file.id}>
                           <td style={{ fontWeight: 700, color: '#0f172a' }}>{file.name}</td>
                           <td style={{ fontFamily: 'monospace', fontSize: '11px', color: '#2563eb' }}>{file.sha256.substring(0, 12)}...{file.sha256.slice(-6)}</td>
                           <td style={{ fontSize: '12px', color: '#475569' }}>{file.timestamp}</td>
-                          <td><button className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '11px' }} onClick={() => setSelectedFileForCert(file)}><span>Sertifikat</span></button></td>
+                          <td><span className="badge badge-emerald" style={{ fontSize: '11px' }}>✓ Terverifikasi</span></td>
                         </tr>
                       ))}
                     </tbody>
@@ -559,22 +544,10 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                 </div>
                 <div style={{ background: '#fff', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                   <strong style={{ color: '#2563eb' }}>🔐 Mode Pelaporan & SHA-256</strong>
-                  <p style={{ marginTop: '2px' }}>Pilih Mode Anonim untuk menyamarkan identitas secara kriptografis, atau Mode Resmi dengan NIK terenkripsi.</p>
+                  <p style={{ marginTop: '2px' }}>Pilih Mode Anonim untuk menyamarkan identitas secara kriptografis, atau Mode Resmi dengan NIK terenkripsi. Hash SHA-256 dikalkulasi client-side untuk integritas bukti.</p>
                 </div>
               </div>
             </div>
-
-            {!isAuthorized && (
-              <div className="card" style={{ background: '#fefce8', border: '1px solid #fde68a' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <AlertCircle size={20} color="#d97706" style={{ flexShrink: 0, marginTop: '2px' }} />
-                  <div>
-                    <h4 style={{ fontSize: '13px', fontWeight: 700, color: '#92400e' }}>Registri Pengaduan Masuk: Akses Terbatas</h4>
-                    <p style={{ fontSize: '12px', color: '#78716c', marginTop: '2px' }}>Daftar pengaduan masuk hanya dapat dilihat oleh Investigator Satgas PPKS yang telah terverifikasi.</p>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -720,6 +693,7 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                       </div>
                       <div style={{ fontSize: '13px', color: '#1e3a8a' }}>
                         <div><strong>Identitas:</strong> {selectedComplaintDetail.reporterIdentity || (selectedComplaintDetail.isAnonymous ? 'PELAPOR-ANON (Terenskripsi Sesi Zero-Knowledge)' : 'Identitas Terverifikasi ID')}</div>
+                        {selectedComplaintDetail.reporterInstitution && <div><strong>Nama Perusahaan / Institusi / PT Pelapor:</strong> {selectedComplaintDetail.reporterInstitution}</div>}
                         <div><strong>Kontak Pelapor:</strong> {selectedComplaintDetail.reporterContact || 'N/A (Anonim Sesi)'}</div>
                         <div><strong>Kontak Person Darurat / Penanggung Jawab:</strong> {selectedComplaintDetail.contactPerson || 'Tidak Dicantumkan'}</div>
                         <div><strong>Enkripsi Payload:</strong> {selectedComplaintDetail.encrypted ? '🔒 Zero-Knowledge Encrypted Payload' : 'Standar'}</div>

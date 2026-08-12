@@ -137,43 +137,7 @@ export default function Header({
               <LogOut size={14} />
             </button>
           </div>
-        ) : (
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{
-              background: '#eff6ff',
-              border: '1px solid #bfdbfe',
-              borderRadius: '10px',
-              padding: '6px 10px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '12px',
-              color: '#1d4ed8',
-              fontWeight: 600
-            }}>
-              <Lock size={14} color="#2563eb" />
-              <span>IDPC-NODE-01</span>
-            </div>
-
-            {threatCount > 0 && (
-              <div style={{
-                background: '#fff1f2',
-                border: '1px solid #fecdd3',
-                borderRadius: '10px',
-                padding: '6px 10px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '12px',
-                color: '#be123c',
-                fontWeight: 600
-              }}>
-                <ShieldAlert size={14} color="#e11d48" />
-                <span>{threatCount} Alert</span>
-              </div>
-            )}
-          </div>
-        )}
+        ) : null}
       </div>
     </header>
   );

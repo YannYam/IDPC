@@ -292,13 +292,81 @@ body {
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 
+@media (max-width: 1280px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 1024px) {
   .grid-4, .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .page-wrapper { padding: 16px; }
+  .top-header { padding: 0 16px; }
+  .sidebar { width: 240px; padding: 16px 10px; }
 }
+
 @media (max-width: 768px) {
   .app-container { flex-direction: column; }
-  .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); }
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    flex-direction: row;
+    padding: 10px 12px;
+    overflow-x: auto;
+    gap: 4px;
+    align-items: center;
+  }
+  .sidebar-logo {
+    padding: 0 8px 0 4px;
+    margin-bottom: 0;
+    border-bottom: none;
+    flex-shrink: 0;
+  }
+  .sidebar-logo .logo-text p { display: none; }
+  .nav-section-label { display: none; }
+  .nav-menu { flex-direction: row; gap: 4px; }
+  .nav-item {
+    padding: 8px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    border-radius: 8px;
+  }
+  .nav-item span { display: none; }
+  .sidebar > div:last-child { display: none; }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .page-wrapper { padding: 12px; }
+  .top-header {
+    height: 56px;
+    padding: 0 12px;
+  }
+  .top-header h2 { font-size: 14px !important; }
+  .header-status { gap: 8px; }
+  .card { padding: 16px; }
+  .card-header { flex-wrap: wrap; gap: 8px; }
+  .card-title { font-size: 15px; }
+  .metric-box { padding: 14px; gap: 12px; }
+  .metric-val { font-size: 22px; }
+  .modal-card {
+    max-width: 100%;
+    margin: 8px;
+    padding: 16px;
+    border-radius: var(--radius-lg);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-overlay { padding: 8px; }
+  .btn { padding: 8px 14px; font-size: 13px; }
+  .custom-table th, .custom-table td { padding: 10px 12px; font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  .sidebar-logo h1 { font-size: 16px; }
+  .card { padding: 12px; border-radius: 12px; }
+  .card-title { font-size: 14px; }
+  .badge { font-size: 11px; padding: 3px 8px; }
+  .form-input, .form-select, .form-textarea { padding: 8px 12px; font-size: 13px; }
+  .top-header { height: 48px; }
+  .brand-badge { font-size: 10px; padding: 3px 8px; }
+  .live-indicator { font-size: 11px; padding: 4px 10px; }
 }
 
 /* Forms & Inputs */

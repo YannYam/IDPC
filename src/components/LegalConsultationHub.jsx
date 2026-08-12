@@ -183,12 +183,17 @@ export default function LegalConsultationHub({ experts, userRole, ppksAuthSessio
     }
   }, [queueTicket]);
 
-  // Handle Taking a New CS Queue Ticket
+  // Handle Taking a New CS Queue Ticket (Randomized CS Agent Assignment)
   const handleTakeQueueTicket = (e) => {
     e.preventDefault();
     const newNum = 14 + Math.floor(Math.random() * 5);
     const newTicketCode = `K-0${newNum}`;
     const newPos = totalWaitingCount + 1;
+
+    // Randomly assign a CS agent from the pool
+    const randomIndex = Math.floor(Math.random() * csAgentsList.length);
+    const assignedAgent = csAgentsList[randomIndex];
+    setActiveCSAgent(assignedAgent);
     
     const newTicket = {
       ticketNo: newTicketCode,
@@ -197,6 +202,7 @@ export default function LegalConsultationHub({ experts, userRole, ppksAuthSessio
       status: 'waiting', // 'waiting', 'in_consultation', 'completed'
       pos: newPos,
       estWaitMinutes: newPos * 3,
+      assignedAgent: assignedAgent.name,
       createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' WIB'
     };
 
@@ -205,13 +211,13 @@ export default function LegalConsultationHub({ experts, userRole, ppksAuthSessio
     setShowTakeQueueModal(false);
     setUserNotes('');
 
-    // Reset chat with welcome greeting for new queue
+    // Reset chat with welcome greeting from the randomly assigned agent
     setChatMessages([
       {
         id: Date.now(),
         sender: 'agent',
-        agentName: activeCSAgent.name,
-        text: `Nomor Antrean Anda (${newTicketCode}) telah tercatat untuk topik "${selectedTopic}". Anda berada di urutan ke-${newPos}. Tim CS Legal kami akan segera terhubung secara otomatis saat giliran Anda tiba.`,
+        agentName: assignedAgent.name,
+        text: `Nomor Antrean Anda (${newTicketCode}) telah tercatat untuk topik "${selectedTopic}". Anda ditugaskan ke ${assignedAgent.name} (${assignedAgent.desk}). Anda berada di urutan ke-${newPos}. Sesi konsultasi akan aktif otomatis saat giliran Anda tiba.`,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' WIB'
       }
     ]);
@@ -464,23 +470,26 @@ export default function LegalConsultationHub({ experts, userRole, ppksAuthSessio
             </div>
           </div>
 
+          {/* Informative Note: Automatic Assignment */}
+          <div style={{ fontSize: '11px', color: '#64748b', background: '#f8fafc', padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+            🔒 <strong>Penugasan Otomatis:</strong> Petugas CS ditugaskan secara acak & seimbang oleh sistem antrean. Pelapor tidak dapat memilih CS secara manual.
+          </div>
+
           {/* List of CS Agents */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '160px', overflowY: 'auto', paddingRight: '4px' }}>
             {csAgentsList.map((agent) => {
               const isActive = activeCSAgent?.id === agent.id;
               return (
                 <div 
                   key={agent.id}
-                  onClick={() => setActiveCSAgent(agent)}
                   style={{ 
                     display: 'flex', 
                     alignItems: 'center', 
                     gap: '10px', 
                     padding: '8px 10px', 
                     borderRadius: '8px', 
-                    background: isActive ? '#eff6ff' : '#f8fafc',
+                    background: isActive ? '#eff6ff' : '#ffffff',
                     border: isActive ? '1.5px solid #2563eb' : '1px solid #e2e8f0',
-                    cursor: 'pointer',
                     transition: 'all 0.2s ease'
                   }}
                 >
@@ -490,7 +499,7 @@ export default function LegalConsultationHub({ experts, userRole, ppksAuthSessio
                   <div style={{ flex: 1, overflow: 'hidden' }}>
                     <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span>{agent.name}</span>
-                      {isActive && <span style={{ fontSize: '9.5px', background: '#2563eb', color: '#fff', padding: '1px 6px', borderRadius: '4px' }}>Aktif Chat</span>}
+                      {isActive && <span style={{ fontSize: '9.5px', background: '#2563eb', color: '#fff', padding: '1px 6px', borderRadius: '4px' }}>Ditugaskan</span>}
                     </div>
                     <div style={{ fontSize: '11px', color: '#0284c7', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {agent.title}

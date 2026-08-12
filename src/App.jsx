@@ -11,7 +11,6 @@ import LegalConsultationHub from './components/LegalConsultationHub';
 import PrivacyLearningCenter from './components/PrivacyLearningCenter';
 
 import { 
-  mockInstitutions, 
   mockAIBreachThreats, 
   mockCampusPPKSCases, 
   mockLegalExperts, 
@@ -42,7 +41,6 @@ export default function App() {
 
   const [threatList, setThreatList] = useState(mockAIBreachThreats);
   const [campusCases, setCampusCases] = useState(mockCampusPPKSCases);
-  const [institutions, setInstitutions] = useState(mockInstitutions);
 
   const handleRequestInvestigatorMode = () => {
     if (!ppksAuthSession.isAuthenticated) {
@@ -85,7 +83,13 @@ export default function App() {
           />
         );
       case 'victim':
-        return <VictimProtectionHub setActiveTab={setActiveTab} />;
+        return (
+          <VictimProtectionHub 
+            setActiveTab={setActiveTab}
+            complaints={complaints}
+            setComplaints={setComplaints}
+          />
+        );
       case 'breach':
         return <AIBreachMonitoring threatList={threatList} setThreatList={setThreatList} />;
       case 'campus':
