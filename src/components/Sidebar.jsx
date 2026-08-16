@@ -24,6 +24,37 @@ export default function Sidebar({ activeTab, setActiveTab, userRole }) {
 
   const categories = ['Layanan Pengaduan', 'Deteksi & Analisis', 'Institusi & Kampus', 'Edukasi & Konsultasi'];
 
+  const renderNavItem = (item) => {
+    const Icon = item.icon;
+    const isActive = activeTab === item.id;
+
+    return (
+      <div
+        key={item.id}
+        className={`nav-item ${isActive ? 'active' : ''}`}
+        onClick={() => setActiveTab(item.id)}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Icon size={18} />
+          <span>{item.label}</span>
+        </div>
+        {item.badge && (
+          <span style={{ 
+            fontSize: '10px', 
+            background: '#7c3aed', 
+            color: '#fff', 
+            padding: '2px 6px', 
+            borderRadius: '6px', 
+            fontWeight: 700 
+          }}>
+            {item.badge}
+          </span>
+        )}
+      </div>
+    );
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -38,43 +69,19 @@ export default function Sidebar({ activeTab, setActiveTab, userRole }) {
 
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {categories.map((cat) => (
-          <div key={cat} style={{ marginBottom: '12px' }}>
+          <div key={cat} style={{ marginBottom: '12px' }} className="desktop-nav-group">
             <div className="nav-section-label">{cat}</div>
-            <div className="nav-menu">
+            <div className="nav-menu desktop-nav-menu">
               {menuItems
                 .filter((item) => item.category === cat)
-                .map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-                  return (
-                    <div
-                      key={item.id}
-                      className={`nav-item ${isActive ? 'active' : ''}`}
-                      onClick={() => setActiveTab(item.id)}
-                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <Icon size={18} />
-                        <span>{item.label}</span>
-                      </div>
-                      {item.badge && (
-                        <span style={{ 
-                          fontSize: '10px', 
-                          background: '#7c3aed', 
-                          color: '#fff', 
-                          padding: '2px 6px', 
-                          borderRadius: '6px', 
-                          fontWeight: 700 
-                        }}>
-                          {item.badge}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
+                .map(renderNavItem)}
             </div>
           </div>
         ))}
+
+        <div className="nav-menu mobile-nav-menu">
+          {menuItems.map(renderNavItem)}
+        </div>
       </div>
 
       <div style={{
