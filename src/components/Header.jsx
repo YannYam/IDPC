@@ -16,7 +16,7 @@ export default function Header({
       case 'complaint': return 'Pusat Pengaduan & Brankas Bukti Digital Terenkripsi';
       case 'victim': return 'Victim Protection Hub (Perlindungan Korban & KSBS)';
       case 'breach': return 'AI Data Breach Monitoring (Deteksi Dini Kebocoran)';
-      case 'campus': return userRole === 'investigator' ? 'Campus Privacy Command Desk (Investigator Satgas PPKS)' : 'Campus Privacy Center (Portal Pelaporan Publik & PPKS)';
+      case 'campus': return userRole === 'investigator' ? 'Campus Privacy Command Desk (Investigator Satgas PPKTPT)' : 'Campus Privacy Center (Portal Pelaporan Publik & PPKTPT)';
       case 'dashboard': return 'National Data Compliance Dashboard (Indeks PDP)';
       case 'rating': return 'Institution Privacy Rating (Rating Kepatuhan Institusi)';
       case 'consultation': return 'Legal Consultation Hub (Konsultasi Pakar & Klinik Hukum)';
@@ -99,7 +99,7 @@ export default function Header({
             }}
           >
             <GraduationCap size={14} color={userRole === 'investigator' ? '#ffffff' : '#64748b'} />
-            <span>Satgas PPKS Investigator</span>
+            <span>Satgas PPKTPT Investigator</span>
           </button>
         </div>
 

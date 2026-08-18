@@ -101,7 +101,7 @@ export default function VictimProtectionHub({ setActiveTab, complaints = [], set
         encrypted: true,
         evidenceCount: evidenceObj.length + (emergencyForm.evidenceNotes ? 1 : 0),
         evidence: evidenceObj,
-        assignedInvestigator: 'Tim Respons Kritis IDPC & PPKS'
+        assignedInvestigator: 'Tim Respons Kritis IDPC & PPKTPT'
       };
 
       setComplaints(prev => [complaintEntry, ...(prev || [])]);
@@ -116,7 +116,7 @@ export default function VictimProtectionHub({ setActiveTab, complaints = [], set
   };
 
   const emergencyContacts = [
-    { name: 'Hotline Satgas PPKS Kemendikbudristek', desc: 'Layanan pengaduan kekerasan seksual perguruan tinggi', number: '177 / 0811-9769-000', badgeClass: 'badge-emerald' },
+    { name: 'Hotline Satgas PPKTPT Kemendikbudristek', desc: 'Layanan pengaduan kekerasan seksual perguruan tinggi', number: '177 / 0811-9769-000', badgeClass: 'badge-emerald' },
     { name: 'IDPC Victim Protection Desk', desc: 'Proteksi darurat kebocoran data & identitas korban', number: '0800-110-IDPC (4372)', badgeClass: 'badge-blue' },
     { name: 'LBH Apik & Mitra Psikologis', desc: 'Pendampingan hukum & trauma healing siber', number: '0813-8882-2669', badgeClass: 'badge-purple' },
     { name: 'Komnas Perempuan', desc: 'Pengaduan kekerasan berbasis gender & seksual', number: '021-3903963', badgeClass: 'badge-rose' }
@@ -223,7 +223,7 @@ export default function VictimProtectionHub({ setActiveTab, complaints = [], set
               </div>
               <div>
                 <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>Penanggung Jawab (Investigator):</span>
-                <strong style={{ color: '#059669' }}>{searchResult.assignedInvestigator || 'Tim Respons Kritis IDPC & PPKS'}</strong>
+                <strong style={{ color: '#059669' }}>{searchResult.assignedInvestigator || 'Tim Respons Kritis IDPC & PPKTPT'}</strong>
               </div>
               <div>
                 <span style={{ color: '#64748b', display: 'block', fontSize: '11px' }}>Identitas Pelapor Protected:</span>
@@ -602,13 +602,12 @@ export default function VictimProtectionHub({ setActiveTab, complaints = [], set
                   <li>Membutuhkan <strong>Bukti Kuat (Strong Evidence)</strong></li>
                   <li>Bypass antrian — langsung ke Tim Kritis</li>
                   <li>Auto-trigger takedown & blokir konten</li>
-                  <li>Notifikasi real-time ke Satgas PPKS</li>
+                  <li>Notifikasi real-time ke Satgas PPKTPT</li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }

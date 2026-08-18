@@ -17,7 +17,7 @@ export default function Sidebar({ activeTab, setActiveTab, userRole }) {
     { id: 'complaint', label: '1. Pengaduan & Bukti Digital', icon: FileLock2, category: 'Layanan Pengaduan' },
     { id: 'victim', label: '2. Eskalasi Darurat Korban', icon: UserCheck, category: 'Layanan Pengaduan' },
     { id: 'breach', label: '3. AI Breach Monitoring', icon: Cpu, category: 'Deteksi & Analisis' },
-    { id: 'campus', label: '4. Campus Privacy Center', icon: GraduationCap, category: 'Institusi & Kampus', badge: userRole === 'investigator' ? 'PPKS Desk' : null },
+    { id: 'campus', label: '4. Campus Privacy Center', icon: GraduationCap, category: 'Institusi & Kampus', badge: userRole === 'investigator' ? 'PPKTPT Desk' : null },
     { id: 'consultation', label: '5. Legal CS & Live Queue', icon: MessageSquare, category: 'Edukasi & Konsultasi' },
     { id: 'learning', label: '6. Privacy Learning', icon: BookOpen, category: 'Edukasi & Konsultasi' },
   ];

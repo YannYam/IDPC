@@ -70,8 +70,8 @@ export default function CampusPrivacyCenter({
   const [selectedCaseForDetail, setSelectedCaseForDetail] = useState(null);
   const [investigatorNoteInput, setInvestigatorNoteInput] = useState('');
   const [caseNotes, setCaseNotes] = useState({
-    'PPKS-2026-001': ['Verifikasi tangkapan layar obrolan selesai. Hash SHA-256 cocok dengan Brankas Bukti.'],
-    'PPKS-2026-002': ['Sesi konseling psikologis darurat telah diberikan kepada korban alias Korban-B44.']
+    'PPKTPT-2026-001': ['Verifikasi tangkapan layar obrolan selesai. Hash SHA-256 cocok dengan Brankas Bukti.'],
+    'PPKTPT-2026-002': ['Sesi konseling psikologis darurat telah diberikan kepada korban alias Korban-B44.']
   });
 
   // Modal for New Case (Investigator)
@@ -122,12 +122,12 @@ export default function CampusPrivacyCenter({
   const handlePublicSubmit = (e) => {
     e.preventDefault();
     if (attachedEvidence.length === 0) {
-      setEvidenceError('Wajib melampirkan minimal 1 (satu) bukti digital konkret (screenshot chat, dokumen, rekaman) sebelum laporan PPKS dapat dikirim.');
+      setEvidenceError('Wajib melampirkan minimal 1 (satu) bukti digital konkret (screenshot chat, dokumen, rekaman) sebelum laporan PPKTPT dapat dikirim.');
       return;
     }
     setEvidenceError('');
 
-    const newId = `PPKS-2026-00${campusCases.length + 1}`;
+    const newId = `PPKTPT-2026-00${campusCases.length + 1}`;
     const alias = reporterForm.isAnonymous 
       ? `Korban-STUDENT-${Math.floor(1000 + Math.random() * 9000)}`
       : `${reporterForm.reporterName} (NIM: ${reporterForm.reporterNim})`;
@@ -198,14 +198,14 @@ export default function CampusPrivacyCenter({
   const handleCreateCampusCase = (e) => {
     e.preventDefault();
     const nowTs = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) + ' WIB';
-    const officer = ppksAuthSession?.officerName || 'Satgas PPKS Kampus';
+    const officer = ppksAuthSession?.officerName || 'Satgas PPKTPT Kampus';
     const newCase = {
-      id: `PPKS-2026-00${campusCases.length + 1}`,
+      id: `PPKTPT-2026-00${campusCases.length + 1}`,
       campus: newCaseForm.campus,
       category: newCaseForm.category,
       victimAlias: newCaseForm.victimAlias,
       priority: newCaseForm.priority,
-      status: 'Dalam Penanganan Satgas PPKS',
+      status: 'Dalam Penanganan Satgas PPKTPT',
       date: new Date().toISOString().split('T')[0],
       assignedInvestigator: officer,
       investigationStartedAt: nowTs
@@ -217,7 +217,7 @@ export default function CampusPrivacyCenter({
   // Handle Investigator Status Change
   const handleUpdateStatus = (caseId, newStatus) => {
     const nowTs = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) + ' WIB';
-    const officer = ppksAuthSession?.officerName || 'Satgas PPKS Kampus';
+    const officer = ppksAuthSession?.officerName || 'Satgas PPKTPT Kampus';
     setCampusCases(campusCases.map(item => {
       if (item.id === caseId) {
         return { 
@@ -252,7 +252,7 @@ export default function CampusPrivacyCenter({
     setInvestigatorNoteInput('');
   };
 
-  // Access control scoping: National Investigators see all campuses or filtered campus; Satgas PPKS Kampus see strictly their own campus.
+  // Access control scoping: National Investigators see all campuses or filtered campus; Satgas PPKTPT Kampus see strictly their own campus.
   const filteredCasesForInvestigator = ppksAuthSession?.isNationalInvestigator
     ? (selectedCampusFilter === 'Semua' ? campusCases : campusCases.filter(c => c.campus === selectedCampusFilter))
     : campusCases.filter(c => c.campus === (ppksAuthSession?.campus || 'Universitas Indonesia'));
@@ -268,10 +268,10 @@ export default function CampusPrivacyCenter({
             </div>
             <div>
               <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a' }}>
-                Campus Privacy Center (Integrasi Satgas PPKS Perguruan Tinggi)
+                Campus Privacy Center (Integrasi Satgas PPKTPT Perguruan Tinggi)
               </h2>
               <p style={{ color: '#475569', fontSize: '13.5px', marginTop: '4px' }}>
-                Pusat penanganan kasus kekerasan siber & pelindungan data pribadi kampus. Memisahkan secara tegas antara Portal Pelapor Publik/Korban dan Portal Investigator Satgas PPKS.
+                Pusat penanganan kasus kekerasan siber & pelindungan data pribadi kampus. Memisahkan secara tegas antara Portal Pelapor Publik/Korban dan Portal Investigator Satgas PPKTPT.
               </p>
             </div>
           </div>
@@ -329,7 +329,7 @@ export default function CampusPrivacyCenter({
             }}
           >
             <GraduationCap size={16} />
-            <span>2. Portal Investigator Satgas PPKS (Internal)</span>
+            <span>2. Portal Investigator Satgas PPKTPT (Internal)</span>
           </button>
         </div>
 
@@ -350,7 +350,7 @@ export default function CampusPrivacyCenter({
               <div className="card-header">
                 <h3 className="card-title">
                   <FileText size={20} color="#2563eb" />
-                  <span>Formulir Pelaporan Darurat Kasus PPKS & Siber</span>
+                  <span>Formulir Pelaporan Darurat Kasus PPKTPT & Siber</span>
                 </h3>
                 <span className="badge badge-purple">Enkripsi End-to-End</span>
               </div>
@@ -358,7 +358,7 @@ export default function CampusPrivacyCenter({
               {!submittedTicket ? (
                 <form onSubmit={handlePublicSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <p style={{ fontSize: '13px', color: '#475569' }}>
-                    Laporan ini akan langsung diteruskan ke <strong>Satgas PPKS Perguruan Tinggi</strong> terkait secara rahasia. Wajib melampirkan bukti digital konkret.
+                    Laporan ini akan langsung diteruskan ke <strong>Satgas PPKTPT Perguruan Tinggi</strong> terkait secara rahasia. Wajib melampirkan bukti digital konkret.
                   </p>
 
                   {/* Section 1: Detail Kampus & Insiden */}
@@ -628,21 +628,21 @@ export default function CampusPrivacyCenter({
                         checked={reporterForm.urgentCounseling}
                         onChange={(e) => setReporterForm({ ...reporterForm, urgentCounseling: e.target.checked })}
                       />
-                      <span>Minta Pendampingan Legal & Psikologis Darurat dari Satgas PPKS 24/7</span>
+                      <span>Minta Pendampingan Legal & Psikologis Darurat dari Satgas PPKTPT 24/7</span>
                     </label>
                   </div>
 
                   <button type="submit" className="btn btn-primary" style={{ padding: '12px' }}>
                     <ShieldCheck size={18} />
-                    <span>Kirim Laporan Kasus & Bukti Ke Satgas PPKS</span>
+                    <span>Kirim Laporan Kasus & Bukti Ke Satgas PPKTPT</span>
                   </button>
                 </form>
               ) : (
                 <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '24px', borderRadius: '12px', textAlign: 'center' }}>
                   <CheckCircle2 size={42} color="#059669" style={{ margin: '0 auto 10px' }} />
-                  <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#047857' }}>LAPORAN PPKS & BUKTI BERHASIL TERKIRIM</h4>
+                  <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#047857' }}>LAPORAN PPKTPT & BUKTI BERHASIL TERKIRIM</h4>
                   <p style={{ fontSize: '13px', color: '#475569', marginTop: '6px' }}>
-                    Laporan beserta {submittedTicket.attachedEvidence.length} bukti digital telah terdaftar dan terenkripsi dalam sistem Satgas PPKS.
+                    Laporan beserta {submittedTicket.attachedEvidence.length} bukti digital telah terdaftar dan terenkripsi dalam sistem Satgas PPKTPT.
                   </p>
 
                   <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', padding: '14px', borderRadius: '8px', margin: '16px 0', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -686,7 +686,7 @@ export default function CampusPrivacyCenter({
                   <input 
                     type="text" 
                     className="form-input" 
-                    placeholder="Masukkan Kode Tiket (Misal: PPKS-2026-001)..."
+                    placeholder="Masukkan Kode Tiket (Misal: PPKTPT-2026-001)..."
                     value={trackTicketInput}
                     onChange={(e) => setTrackTicketInput(e.target.value)}
                   />
@@ -699,7 +699,7 @@ export default function CampusPrivacyCenter({
                   <div style={{ marginTop: '16px' }}>
                     {trackedCaseResult.status === 'NOT_FOUND' ? (
                       <div style={{ background: '#fff1f2', border: '1px solid #fecdd3', padding: '12px', borderRadius: '8px', fontSize: '13px', color: '#be123c' }}>
-                        Kode Tiket tidak ditemukan dalam basis data Satgas PPKS. Pastikan format nomor tiket benar.
+                        Kode Tiket tidak ditemukan dalam basis data Satgas PPKTPT. Pastikan format nomor tiket benar.
                       </div>
                     ) : (
                       <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '14px', borderRadius: '10px', fontSize: '13px' }}>
@@ -722,7 +722,7 @@ export default function CampusPrivacyCenter({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                   <ShieldAlert size={32} color="#7c3aed" />
                   <div>
-                    <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>Anda Anggota Satgas PPKS Kampus?</h4>
+                    <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>Anda Anggota Satgas PPKTPT Kampus?</h4>
                     <p style={{ fontSize: '12.5px', color: '#475569', marginTop: '2px' }}>
                       Masuk dengan verifikasi NIP/ID resmi untuk mengelola berkas pengaduan, verifikasi bukti digital, dan memperbarui status kasus.
                     </p>
@@ -743,7 +743,7 @@ export default function CampusPrivacyCenter({
       )}
 
       {/* ========================================================= */}
-      {/* 2. INVESTIGATOR PORTAL INTERFACE (Satgas PPKS Kampus Internal) */}
+      {/* 2. INVESTIGATOR PORTAL INTERFACE (Satgas PPKTPT Kampus Internal) */}
       {/* ========================================================= */}
       {activePortalTab === 'investigator' && (
         <>
@@ -752,10 +752,10 @@ export default function CampusPrivacyCenter({
             <div className="card" style={{ textAlign: 'center', padding: '48px 24px', background: '#f8fafc', border: '2px dashed #cbd5e1' }}>
               <Lock size={48} color="#7c3aed" style={{ margin: '0 auto 16px' }} />
               <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a' }}>
-                Akses Terbatas: Satgas PPKS Investigator Command Desk
+                Akses Terbatas: Satgas PPKTPT Investigator Command Desk
               </h3>
               <p style={{ fontSize: '13.5px', color: '#475569', maxWidth: '520px', margin: '8px auto 24px' }}>
-                Portal ini hanya dapat diakses oleh Anggota Satgas PPKS Perguruan Tinggi terverifikasi berdasarkan Permendikbudristek No. 30/2021 & UU PDP No. 27/2022.
+                Portal ini hanya dapat diakses oleh Anggota Satgas PPKTPT Perguruan Tinggi terverifikasi berdasarkan Permendikbudristek No. 30/2021 & UU PDP No. 27/2022.
               </p>
               <button 
                 className="btn" 
@@ -763,7 +763,7 @@ export default function CampusPrivacyCenter({
                 onClick={onRequestAuth}
               >
                 <Key size={18} />
-                <span>Verifikasi Identitas & Masuk Portal Satgas PPKS</span>
+                <span>Verifikasi Identitas & Masuk Portal Satgas PPKTPT</span>
               </button>
             </div>
           ) : (
@@ -831,7 +831,7 @@ export default function CampusPrivacyCenter({
                   </div>
                   <div>
                     <div className="metric-val">{campusCases.length}</div>
-                    <div className="metric-lbl">Kasus PPKS Terenkripsi</div>
+                    <div className="metric-lbl">Kasus PPKTPT Terenkripsi</div>
                   </div>
                 </div>
               </div>
@@ -841,7 +841,7 @@ export default function CampusPrivacyCenter({
                 <div className="card-header">
                   <h3 className="card-title">
                     <GraduationCap size={20} color="#7c3aed" />
-                    <span>Direktori Kasus & Audit Satgas PPKS ({ppksAuthSession.campus})</span>
+                    <span>Direktori Kasus & Audit Satgas PPKTPT ({ppksAuthSession.campus})</span>
                   </h3>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -870,7 +870,7 @@ export default function CampusPrivacyCenter({
                   <table className="custom-table">
                     <thead>
                       <tr>
-                        <th>ID Registrasi PPKS</th>
+                        <th>ID Registrasi PPKTPT</th>
                         <th>Perguruan Tinggi</th>
                         <th>Kategori Kasus Siber</th>
                         <th>Alias Kripto Korban</th>
@@ -971,7 +971,7 @@ export default function CampusPrivacyCenter({
                           onChange={(e) => handleUpdateStatus(selectedCaseForDetail.id, e.target.value)}
                         >
                           <option>Terdaftar - Menunggu Verifikasi Satgas</option>
-                          <option>Dalam Penanganan Satgas PPKS</option>
+                          <option>Dalam Penanganan Satgas PPKTPT</option>
                           <option>Pendampingan Hukum & Verifikasi Bukti</option>
                           <option>Penyidikan Selesai & Rekomendasi Sanksi Rektor</option>
                           <option>Selesai & Proteksi Identitas Dipermanenkan</option>
@@ -1027,7 +1027,7 @@ export default function CampusPrivacyCenter({
           <div className="modal-card">
             <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a' }}>
               <Plus size={20} color="#2563eb" />
-              <span>Registrasi Penanganan Kasus Satgas PPKS Baru</span>
+              <span>Registrasi Penanganan Kasus Satgas PPKTPT Baru</span>
             </h3>
 
             <form onSubmit={handleCreateCampusCase}>

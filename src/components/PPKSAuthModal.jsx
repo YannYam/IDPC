@@ -23,15 +23,15 @@ export default function PPKSAuthModal({ isOpen, onClose, onAuthenticate }) {
     {
       campus: 'Universitas Indonesia',
       officerName: 'Dr. Rina Wijaya, S.H., M.H.',
-      officerId: 'PPKS-UI-2026-092',
-      roleTitle: 'Ketua Satgas PPKS & Investigator UI',
+      officerId: 'PPKTPT-UI-2026-092',
+      roleTitle: 'Ketua Satgas PPKTPT & Investigator UI',
       isNationalInvestigator: false,
       pin: '8899'
     },
     {
       campus: 'Universitas Gadjah Mada',
       officerName: 'Prof. Dr. Hendra K., M.Si.',
-      officerId: 'PPKS-UGM-2026-104',
+      officerId: 'PPKTPT-UGM-2026-104',
       roleTitle: 'Kepala Divisi Penanganan Korban UGM',
       isNationalInvestigator: false,
       pin: '7722'
@@ -39,8 +39,8 @@ export default function PPKSAuthModal({ isOpen, onClose, onAuthenticate }) {
     {
       campus: 'Universitas Mataram',
       officerName: 'Dr. Ahmad Zaini, S.H.',
-      officerId: 'PPKS-UNRAM-2026-301',
-      roleTitle: 'Koordinator Satgas PPKS UNRAM',
+      officerId: 'PPKTPT-UNRAM-2026-301',
+      roleTitle: 'Koordinator Satgas PPKTPT UNRAM',
       isNationalInvestigator: false,
       pin: '5511'
     }
@@ -49,7 +49,7 @@ export default function PPKSAuthModal({ isOpen, onClose, onAuthenticate }) {
   const handleManualLogin = (e) => {
     e.preventDefault();
     if (!officerId.trim()) {
-      setErrorMessage('Nomor ID / NIP Satgas PPKS wajib diisi.');
+      setErrorMessage('Nomor ID / NIP Satgas PPKTPT wajib diisi.');
       return;
     }
     setErrorMessage('');
@@ -64,7 +64,7 @@ export default function PPKSAuthModal({ isOpen, onClose, onAuthenticate }) {
         officerName: `Petugas (${officerId.trim()})`,
         officerId: officerId.trim(),
         campus: selectedCampus,
-        roleTitle: isNat ? 'Investigator Nasional IDPC' : `Satgas PPKS ${selectedCampus}`,
+        roleTitle: isNat ? 'Investigator Nasional IDPC' : `Satgas PPKTPT ${selectedCampus}`,
         isNationalInvestigator: isNat,
         token: `AUTH-SIG-${Math.floor(10000 + Math.random() * 90000)}`,
         verifiedAt: new Date().toLocaleString()
@@ -106,10 +106,10 @@ export default function PPKSAuthModal({ isOpen, onClose, onAuthenticate }) {
           </div>
           <div>
             <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>
-              Autentikasi Satgas PPKS Perguruan Tinggi
+              Autentikasi Satgas PPKTPT Perguruan Tinggi
             </h3>
             <p style={{ fontSize: '12.5px', color: '#475569', marginTop: '2px' }}>
-              Verifikasi keabsahan identitas Anggota Satgas PPKS sebelum mengakses Investigator Command Desk.
+              Verifikasi keabsahan identitas Anggota Satgas PPKTPT sebelum mengakses Investigator Command Desk.
             </p>
           </div>
         </div>
@@ -132,11 +132,11 @@ export default function PPKSAuthModal({ isOpen, onClose, onAuthenticate }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Nomor ID Satgas PPKS / NIP / NIDN Official</label>
+            <label className="form-label">Nomor ID Satgas PPKTPT / NIP / NIDN Official</label>
             <input 
               type="text"
               className="form-input"
-              placeholder="Contoh: PPKS-UI-2026-092 atau NIP 1985..."
+              placeholder="Contoh: PPKTPT-UI-2026-092 atau NIP 1985..."
               value={officerId}
               onChange={(e) => setOfficerId(e.target.value)}
             />

@@ -388,7 +388,7 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                       </div>
 
                       <p style={{ fontSize: '11.5px', color: '#64748b', margin: 0 }}>
-                        🔒 Identitas Anda disimpang dengan enkripsi AES-256 dan hanya dapat diakses oleh investigator PPKS resmi.
+                        🔒 Identitas Anda disimpang dengan enkripsi AES-256 dan hanya dapat diakses oleh investigator PPKTPT resmi.
                       </p>
                     </div>
                   )}
@@ -637,7 +637,7 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
                           Detail Pengaduan: {selectedComplaintDetail.ticketCode}
                         </h3>
                         <p style={{ fontSize: '12px', color: '#64748b' }}>
-                          Daftar Audit Investigasi Resmi IDPC & Satgas PPKS
+                          Daftar Audit Investigasi Resmi IDPC & Satgas PPKTPT
                         </p>
                       </div>
                     </div>
@@ -790,7 +790,7 @@ export default function SecureComplaintCenter({ complaints, setComplaints, ppksA
               <p style={{ fontSize: '13.5px', color: '#475569', maxWidth: '560px', margin: '8px auto 16px', lineHeight: '1.6' }}>
                 {isAuthorized 
                   ? `Sesi Anda terverifikasi sebagai (${ppksAuthSession.officerName} - ${ppksAuthSession.campus}). Registri Pengaduan & Audit Nasional ini hanya dapat diakses oleh Investigator Nasional IDPC. Untuk mengelola berkas kasus kampus Anda, silakan beralih ke modul Campus Privacy Center.`
-                  : 'Registri audit pengaduan nasional ini dilindungi oleh sertifikat otoritas investigator. Silakan masuk melalui Portal Investigator Satgas PPKS.'
+                  : 'Registri audit pengaduan nasional ini dilindungi oleh sertifikat otoritas investigator. Silakan masuk melalui Portal Investigator Satgas PPKTPT.'
                 }
               </p>
               {!isAuthorized && (

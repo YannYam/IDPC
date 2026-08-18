@@ -63,7 +63,7 @@ export default function LegalConsultationHub({ experts, userRole, ppksAuthSessio
     {
       id: 3,
       name: 'Adv. Maya Kusuma, S.H.',
-      title: 'Konsultan LBH PPKS Kampus & KSBS',
+      title: 'Konsultan LBH PPKTPT Kampus & KSBS',
       desk: 'Loket CS 03 (Pendampingan KSBS Korban)',
       rating: '4.8/5.0',
       status: 'Online - Live CS',
@@ -244,7 +244,7 @@ export default function LegalConsultationHub({ experts, userRole, ppksAuthSessio
 
     // Dynamic CS Agent AI / Simulated Response Logic
     setTimeout(() => {
-      let replyText = `Terima kasih atas informasi Anda. Berdasarkan ketentuan Hukum Pelindungan Data Pribadi (UU No. 27 Tahun 2022), kasus ini dapat segera kami daftarkan ke Registri Pengaduan Resmi atau diekskalasi ke Satgas PPKS Kampus terkait.`;
+      let replyText = `Terima kasih atas informasi Anda. Berdasarkan ketentuan Hukum Pelindungan Data Pribadi (UU No. 27 Tahun 2022), kasus ini dapat segera kami daftarkan ke Registri Pengaduan Resmi atau diekskalasi ke Satgas PPKTPT Kampus terkait.`;
       
       const lower = userText.toLowerCase();
       if (lower.includes('denda') || lower.includes('sanksi') || lower.includes('pidana')) {
@@ -763,7 +763,7 @@ export default function LegalConsultationHub({ experts, userRole, ppksAuthSessio
                   <option>Konsultasi Pelanggaran Privasi Data & UU PDP</option>
                   <option>Bantuan Darurat KSBS & Ancaman Intim (NCII)</option>
                   <option>Penyusunan Draft Surat Somasi Legal & Peringatan</option>
-                  <option>Eskalasi Laporan ke Satgas PPKS Kampus Internal</option>
+                  <option>Eskalasi Laporan ke Satgas PPKTPT Kampus Internal</option>
                   <option>Prosedur Audit Keamanan Data & Sertifikasi Compliance</option>
                 </select>
               </div>
