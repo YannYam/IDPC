@@ -210,6 +210,10 @@ body {
   gap: 4px;
 }
 
+.mobile-nav-menu {
+  display: none;
+}
+
 .nav-item {
   display: flex;
   align-items: center;
