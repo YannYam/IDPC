@@ -149,7 +149,7 @@ export default function VictimProtectionHub({ setActiveTab, complaints = [], set
             <div>
               <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a' }}>Pusat Perlindungan & Eskalasi Darurat Korban</h2>
               <p style={{ color: '#475569', fontSize: '13.5px', marginTop: '4px', maxWidth: '640px' }}>
-                Layanan eskalasi darurat bagi korban kekerasan siber, KSBS, dan pelanggaran data pribadi. Proteksi fast-track SLA 2 Jam membutuhkan <strong>Bukti Kuat (Strong Evidence)</strong> sesuai UU PDP No. 27/2022.
+                Layanan eskalasi darurat bagi korban kekerasan siber, KSBS, dan pelanggaran data pribadi. Proteksi fast-track SLA 2 Jam membutuhkan <strong>Bukti Kuat (Strong Evidence)</strong> sesuai UU Pelindungan Data Pribadi.
               </p>
             </div>
           </div>
@@ -566,7 +566,7 @@ export default function VictimProtectionHub({ setActiveTab, complaints = [], set
             <div className="card-header">
               <h3 className="card-title">
                 <HeartHandshake size={20} color="#059669" />
-                <span>Hak Korban (UU PDP No. 27/2022)</span>
+                <span>Hak Korban (UU Pelindungan Data Pribadi)</span>
               </h3>
             </div>
             <ul style={{ paddingLeft: '18px', fontSize: '13px', color: '#475569', display: 'flex', flexDirection: 'column', gap: '8px' }}>

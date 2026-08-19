@@ -755,7 +755,7 @@ export default function CampusPrivacyCenter({
                 Akses Terbatas: Satgas PPKTPT Investigator Command Desk
               </h3>
               <p style={{ fontSize: '13.5px', color: '#475569', maxWidth: '520px', margin: '8px auto 24px' }}>
-                Portal ini hanya dapat diakses oleh Anggota Satgas PPKTPT Perguruan Tinggi terverifikasi berdasarkan Permendikbudristek No. 30/2021 & UU PDP No. 27/2022.
+                Portal ini hanya dapat diakses oleh Anggota Satgas PPKTPT Perguruan Tinggi terverifikasi berdasarkan Permendikbudristek No. 30/2021 & UU Pelindungan Data Pribadi.
               </p>
               <button 
                 className="btn" 

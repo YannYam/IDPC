@@ -13,7 +13,7 @@ export default function PrivacyLearningCenter({ modules }) {
       question: "Apakah subjek data pribadi berhak mengakhiri pemrosesan & meminta penghapusan data pribadinya?",
       options: [
         "A. Tidak berhak, pengendali data memegang hak milik penuh.",
-        "B. Berhak, sesuai Pasal 8 UU PDP No. 27/2022.",
+        "B. Berhak, sesuai Pasal 8 UU Pelindungan Data Pribadi.",
         "C. Hanya berhak jika data berupa rekening bank.",
         "D. Berhak hanya jika diizinkan oleh pihak kepolisian."
       ],

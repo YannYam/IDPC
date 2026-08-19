@@ -24,7 +24,7 @@ export default function DataComplianceDashboard({ institutions }) {
             <div>
               <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a' }}>National Data Compliance Dashboard (Indeks UU PDP Nasional)</h2>
               <p style={{ color: '#475569', fontSize: '13.5px', marginTop: '4px' }}>
-                Dashboard pemantauan tingkat kepatuhan Undang-Undang Pelindungan Data Pribadi (UU PDP No. 27/2022) seluruh kementerian, perguruan tinggi, korporasi, & pemda di Indonesia.
+                Dashboard pemantauan tingkat kepatuhan Undang-Undang Pelindungan Data Pribadi (UU PDP) seluruh kementerian, perguruan tinggi, korporasi, & pemda di Indonesia.
               </p>
             </div>
           </div>

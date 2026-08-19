@@ -248,7 +248,7 @@ export default function LegalConsultationHub({ experts, userRole, ppksAuthSessio
       
       const lower = userText.toLowerCase();
       if (lower.includes('denda') || lower.includes('sanksi') || lower.includes('pidana')) {
-        replyText = `Sesuai Pasal 67-68 UU PDP No. 27/2022, setiap orang/lembaga yang secara melawan hukum mengungkapkan atau menggunakan data pribadi dapat dikenakan sanksi pidana penjara hingga 5 tahun dan denda pidana maksimal Rp 5 Miliar s.d. Rp 60 Miliar.`;
+        replyText = `Sesuai Pasal 67-68 UU Pelindungan Data Pribadi, setiap orang/lembaga yang secara melawan hukum mengungkapkan atau menggunakan data pribadi dapat dikenakan sanksi pidana penjara hingga 5 tahun dan denda pidana maksimal Rp 5 Miliar s.d. Rp 60 Miliar.`;
       } else if (lower.includes('sebar') || lower.includes('foto') || lower.includes('ancam') || lower.includes('intim') || lower.includes('ksbs')) {
         replyText = `Ini merupakan ancaman kritis KSBS/NCII. Harap segera amankan bukti tangkapan layar di menu '1. Pengaduan & Bukti Digital' untuk mengunci hash SHA-256 legal. Tim CS IDPC+ juga dapat langsung menerbitkan Surat Somasi Peringatan Hukum Darurat untuk menghentikan penyebaran.`;
       } else if (lower.includes('satgas') || lower.includes('kampus') || lower.includes('identitas') || lower.includes('anonim')) {
@@ -565,7 +565,7 @@ export default function LegalConsultationHub({ experts, userRole, ppksAuthSessio
             <Sparkles size={12} color="#0284c7" /> Pertanyaan Cepat:
           </span>
           {[
-            '❓ Berapa denda pidana UU PDP No. 27/2022?',
+            '❓ Berapa denda pidana UU Pelindungan Data Pribadi?',
             '🛡️ Bagaimana jika pelaku mengancam sebar data hari ini?',
             '📋 Minta template Draft Surat Somasi Legal resmi',
             '🎓 Apakah identitas saya terjamin anonim dari Kampus?'

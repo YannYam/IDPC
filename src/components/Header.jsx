@@ -45,7 +45,7 @@ export default function Header({
     <header className="top-header">
       <div className="header-title">
         <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a' }}>{getTabTitle()}</h2>
-        <span className="brand-badge">UU PDP NO. 27/2022</span>
+        <span className="brand-badge">STANDAR KEPATUHAN PDP</span>
       </div>
 
       <div className="header-status" style={{ gap: '14px' }}>

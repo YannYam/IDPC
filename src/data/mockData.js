@@ -19,7 +19,7 @@ export const mockLegalExperts = [
 ];
 
 export const mockLearningModules = [
-  { id: 1, title: "Hak Subjek Data Menurut UU PDP No. 27/2022", duration: "15 Menit", level: "Dasar", lessons: 4, scoreNeeded: 80 },
+  { id: 1, title: "Hak Subjek Data Menurut UU Pelindungan Data Pribadi", duration: "15 Menit", level: "Dasar", lessons: 4, scoreNeeded: 80 },
   { id: 2, title: "Proteksi Data Korban Kekerasan Seksual & Siber", duration: "25 Menit", level: "Menengah", lessons: 6, scoreNeeded: 85 },
   { id: 3, title: "Prosedur Legal Admissibility Bukti Digital (ITE & PDP)", duration: "30 Menit", level: "Lanjutan", lessons: 5, scoreNeeded: 85 }
 ];
