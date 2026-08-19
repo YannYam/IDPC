@@ -606,9 +606,11 @@ export default function VictimProtectionHub({ setActiveTab, complaints = [], set
                 </ul>
               </div>
             </div>
-          </div>
         </div>
+      </div>
     </div>
-  );
+  </div>
+);
 }
+
 
